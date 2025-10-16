@@ -1,0 +1,210 @@
+version: "3.8"
+
+services:
+  frontend:
+    container_name: frontend
+
+    build:
+      context: ./client
+
+    networks:
+      - front-net
+
+    volumes:
+      - frontend-dist:/app/dist
+
+    healthcheck:
+      test: ["CMD-SHELL", "test -d /app/dist && [ -n \"$(ls -A /app/dist 2>/dev/null)\" ]"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    command: sh -c "npm install && npm run build"
+
+    restart: "no"
+    
+
+  backend:
+    container_name: backend
+
+    build:
+      context: ./server
+
+    expose:
+      - "3000" 
+
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+    networks:
+      - back-net
+      - db-net
+    
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      MONGODB_URI: mongodb://boring:2rwR8iDtKUFm4krEkLiuXT6hRvcb6xoz37BT@mongodb:27017/boring-crm?authSource=admin
+
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+    restart: unless-stopped
+
+  mongodb:
+    container_name: mongodb
+
+    image: mongo:8.0
+    
+    ports:
+      - "5001:27017"
+
+    volumes:
+      - ./mongo/data:/data/db
+      - ./mongo/logs:/var/log/mongodb
+
+    networks:
+      - db-net
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: boring
+      MONGO_INITDB_ROOT_PASSWORD: 2rwR8iDtKUFm4krEkLiuXT6hRvcb6xoz37BT
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    restart: unless-stopped
+
+  nginx:
+    container_name: nginx
+
+    image: nginx:alpine
+
+    networks:
+      - front-net
+      - back-net
+
+    ports:
+      - "80:80"
+
+    depends_on:
+      frontend:
+        condition: service_completed_successfully
+      backend:
+        condition: service_started
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - frontend-dist:/usr/share/nginx/html:ro
+
+    restart: unless-stopped
+
+
+  loki:
+    container_name: loki
+
+    image: grafana/loki:3.1.1
+
+    ports:
+      - "3100:3100"
+
+    command: -config.file=/etc/loki/config.yaml
+
+    volumes:
+      - ./monitoring/loki/config.yaml:/etc/loki/config.yaml:ro
+      - ./monitoring/loki/data:/loki
+
+    networks:
+      - monitoring
+      
+    restart: unless-stopped
+
+  promtail:
+    container_name: promtail
+
+    image: grafana/promtail:3.1.1
+
+    depends_on:
+      - loki
+
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./monitoring/promtail/config.yaml:/etc/promtail/config.yaml:ro
+
+    networks:
+      - monitoring
+      - back-net
+      - db-net
+      - front-net
+
+    restart: unless-stopped
+
+  grafana:
+    container_name: grafana
+
+    image: grafana/grafana:11.2.0
+
+    depends_on:
+      - loki
+
+    ports:
+      - "3002:3000"
+
+    volumes:
+      - ./monitoring/grafana/data:/var/lib/grafana
+
+    environment:
+      - GF_SECURITY_ADMIN_USER=boring
+      - GF_SECURITY_ADMIN_PASSWORD=2rwR8iDtKUFm4krEkLiuXT6hRvcb6xoz37BT
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+
+    networks:
+      - monitoring
+    
+    restart: unless-stopped
+
+volumes:
+  frontend-dist:
+
+networks:
+  # фронт <-> nginx
+  front-net:
+    driver: bridge
+    internal: false
+
+  # nginx <-> backend
+  back-net:
+    driver: bridge
+    internal: true
+
+  # backend <-> mongodb
+  db-net:
+    driver: bridge
+    internal: true

@@ -1,0 +1,1 @@
+import type { IOffer } from "./types";

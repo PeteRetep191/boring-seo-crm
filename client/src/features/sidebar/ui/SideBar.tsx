@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 // components
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Button, Tooltip } from '@heroui/react';
@@ -38,6 +38,7 @@ const NAV_ITEMS: NavItem[] = [
 const SideBar: React.FC = () => {
     const [ collapsed, setCollapsed ] = useState<boolean>(true);
     const { pathname } = useLocation();
+    const navigate = useNavigate();
 
     return (
         <div className='relative'>
@@ -114,7 +115,7 @@ const SideBar: React.FC = () => {
                             </div>
                         )}
                         <Tooltip content="Log Out" placement="top">
-                            <Button variant="flat" isIconOnly color="danger" size="sm" className={`${collapsed ? 'w-full' : ''}`}>
+                            <Button variant="flat" isIconOnly color="danger" onPress={() => navigate("/login")} size="sm" className={`${collapsed ? 'w-full' : ''}`}>
                                 <LogOut size={16} />
                             </Button>
                         </Tooltip>

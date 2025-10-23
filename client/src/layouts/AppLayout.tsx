@@ -15,7 +15,7 @@ const AppLayout: React.FC = () => {
   
   return (
     <div className="app-layout">
-      <Suspense fallback={<Loader />}>
+      <Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader /></div>}>
         <Await resolve={ready}>
           <div className='flex flex-row w-full h-screen overflow-hidden'>
             <SideBar />

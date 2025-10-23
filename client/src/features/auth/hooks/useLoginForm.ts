@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useImmer } from "use-immer";
+import { useNavigate } from "react-router-dom";
 // repository
 import { sessionIdRepo } from "@/entities/session-id";
 // utils
@@ -22,6 +23,7 @@ const INITIAL_FORM_STATE: LoginFormState = {
 // Hook
 // ========================
 const useLoginForm = (): LoginFormApi => {
+    const navigate = useNavigate();
     const [state, update] = useImmer<LoginFormState>(INITIAL_FORM_STATE);
 
     // --------------------------
@@ -47,6 +49,7 @@ const useLoginForm = (): LoginFormApi => {
 
             sessionIdRepo.saveSessionId(fakeResponse.sessionId);
             toast.success("Login successful!");
+            navigate("/");
         } catch (error) {
             toast.error("Login failed. Please try again.");
         } finally {

@@ -22,6 +22,7 @@ const LoginForm: React.FC = () => {
                     <Input
                         type="email"
                         label="E-mail"
+                        variant="bordered"
                         placeholder="you@example.com"
                         value={loginForm.state.formData.email}
                         onValueChange={(v) => loginForm.actions.update((d) => void (d.formData.email = v))}
@@ -33,6 +34,7 @@ const LoginForm: React.FC = () => {
                     <Input
                         type="password"
                         label="Password"
+                        variant="bordered"
                         placeholder="••••••••"
                         value={loginForm.state.formData.password}
                         onValueChange={(v) => loginForm.actions.update((d) => void (d.formData.password = v))}

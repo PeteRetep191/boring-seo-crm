@@ -18,7 +18,7 @@ const NotFoundPage = lazy( () => import("@/pages/NotFoundPage"));
 // Helpers
 // =========================
 export function isAuthenticated() {
-  const ready = new Promise<void>(resolve => setTimeout(resolve, 500));
+  const ready = new Promise<void>(resolve => setTimeout(resolve, 200));
   return { ready };
 }
 
@@ -33,7 +33,7 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: (
-                    <Suspense fallback={<Loader />}>
+                    <Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader /></div>}>
                         <LoginPage />
                     </Suspense>
                 )
@@ -80,7 +80,7 @@ export const router = createBrowserRouter([
     {
         path: "*",
         element: (
-            <Suspense fallback={<Loader />}>
+            <Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader /></div>}>
                 <NotFoundPage />
             </Suspense>
         ),

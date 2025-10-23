@@ -26,19 +26,20 @@ const OffersPage: React.FC = () => {
 
             <div className="flex flex-1 items-center justify-start gap-2">
                 <Input 
-                    placeholder="Search sites..." 
+                    placeholder="Search offers..." 
                     className="mr-4" 
                 />
             </div>
 
             <div className="flex flex-1 items-center justify-end gap-2">
                 <Button 
-                    onPress={() => navigate("/sites/new")}
+                    // onPress={() => navigate("/sites/new")}
                     variant="solid"
                     color="primary"
+                    isDisabled
                     startContent={<Plus size={16} />}
                 >
-                        Add New Site
+                        Add New Offer
                 </Button>
             </div>
         </DynamicTableHeader>

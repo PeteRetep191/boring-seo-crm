@@ -53,7 +53,7 @@ const OffersPage: React.FC = () => {
                         tableId: "sites-table",
                     }}
                 />
-                <ScalablePanel maxWidth="350px" title="Quick Filters">
+                <ScalablePanel maxWidth={300} title="Quick Filters">
                     <ScalablePanelHeader className="flex flex-1 items-center justify-between gap-4 pt-2">
                         <h3 className="text-md font-medium truncate">Quick Filters</h3>
                     </ScalablePanelHeader>

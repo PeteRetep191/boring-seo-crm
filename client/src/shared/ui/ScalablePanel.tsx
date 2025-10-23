@@ -37,12 +37,9 @@ const ScalablePanel: React.FC<ScalablePanelProps> = ({ children, maxWidth, title
             <Card
                 shadow="none"
                 radius="none"
-                style={{ ["--maxW" as any]: maxW, ["--minW" as any]: minW }}
-                className={`${
-                    state.isExpanded
-                        ? "w-[clamp(var(--minW),min(35vw,var(--maxW)),var(--maxW))]"
-                        : `w-[${collapsedW}]`
-                } transition-all duration-300`}
+                className={state.isExpanded
+                    ? "w-[clamp(300px,min(35vw,650px),650px)] transition-all duration-300"
+                    : "w-[50px] transition-all duration-300"}
             >
                 {state.isExpanded && (
                     <CardHeader className="pt-1 min-h-7">

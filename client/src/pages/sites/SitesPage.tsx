@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 // components
 import { Button, Input, Pagination } from "@heroui/react";
+import { ScalablePanel, ScalablePanelHeader, ScalablePanelFooter, ScalablePanelBody } from "@/shared/ui";
 import { DynamicTable, DynamicTableBody, DynamicTableFooter, DynamicTableHeader, TableGrid } from "@/features/components/dynamic-table/ui";
 import { Plus } from "lucide-react";
 
@@ -42,7 +43,7 @@ const SitesPage: React.FC = () => {
                 </Button>
             </div>
         </DynamicTableHeader>
-        <DynamicTableBody className="h-[400px]">
+        <DynamicTableBody className="flex gap-10  h-[calc(100vh-170px)]">
             <TableGrid
                 props={{
                     rowData: MOCK_SITES_DATA,
@@ -51,6 +52,17 @@ const SitesPage: React.FC = () => {
                     tableId: "sites-table",
                 }}
             />
+            <ScalablePanel maxWidth="350px" title="Quick Filters">
+                <ScalablePanelHeader className="flex flex-1 items-center justify-between gap-4 pt-2">
+                    <h3 className="text-md font-medium truncate">Quick Filters</h3>
+                </ScalablePanelHeader>
+                <ScalablePanelBody>
+                    тут будут фильтры
+                </ScalablePanelBody>
+                <ScalablePanelFooter className="flex-1">
+                    <Button variant="flat" isDisabled color="primary" className="w-full" fullWidth>Apply Filters</Button>
+                </ScalablePanelFooter>
+            </ScalablePanel>
         </DynamicTableBody>
         <DynamicTableFooter className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground mr-4">

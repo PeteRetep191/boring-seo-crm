@@ -11,13 +11,17 @@ const INITIAL_STATE = {
     isExpanded: true,
 };
 
-const ScalablePanel: React.FC<ScalablePanelProps> = ({ children, title="Showcases Panel" }) => {
+const ScalablePanel: React.FC<ScalablePanelProps> = ({ children, maxWidth, title="Showcases Panel" }) => {
 
     const [ state, update ] = useImmer<ScalablePanelState>(INITIAL_STATE);
 
     const headerEl = pickFirstChildOfType(children, ScalablePanelHeader);
     const bodyEl = pickFirstChildOfType(children, ScalablePanelBody);
     const footerEl = pickFirstChildOfType(children, ScalablePanelFooter);
+
+    const maxW = typeof maxWidth === "number" ? `${maxWidth}px` : (maxWidth ?? "650px");
+    const minW = "300px";          // можно вынести в проп, если нужно
+    const collapsedW = "50px";     // ширина в свернутом виде
 
     // -------------------------
     // Actions
@@ -33,7 +37,12 @@ const ScalablePanel: React.FC<ScalablePanelProps> = ({ children, title="Showcase
             <Card
                 shadow="none"
                 radius="none"
-                className={`${state.isExpanded ? "w-[clamp(300px,35vw,650px)]" : "w-[50px]"} transition-all duration-300`}
+                style={{ ["--maxW" as any]: maxW, ["--minW" as any]: minW }}
+                className={`${
+                    state.isExpanded
+                        ? "w-[clamp(var(--minW),min(35vw,var(--maxW)),var(--maxW))]"
+                        : `w-[${collapsedW}]`
+                } transition-all duration-300`}
             >
                 {state.isExpanded && (
                     <CardHeader className="pt-1 min-h-7">
@@ -89,6 +98,7 @@ export type ScalablePanelProps = {
     headerChildren?: React.ReactNode;
     footerChildren?: React.ReactNode;
     title?: string;
+    maxWidth?: string;
 };
 
 export type ScalablePanelState = {

@@ -3,39 +3,74 @@
 @source '../../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
 
-
-
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+    --sidebar-background-color-dark: #0a0d0f;
+    --sidebar-background-color-light: #e5e5e5;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #212121;
+    --sidebar-background-color-light-hover: #dcdcdc;
+    --sidebar-background-color-dark-hover: #13395e;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    --background-color-dark: #191919;
+
+    font-family: 'Montserrat', sans-serif;
 }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;      /* IE/Edge */
-  scrollbar-width: none;         /* Firefox */
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;                 /* Chrome/Safari */
-}
+html[data-theme="light"] {
+  --sidebar-bg: #f8f9fa;
+  --sidebar-header-bg: #ffffff;
+  --sidebar-footer-bg: #ffffff;
+  --sidebar-border: #e9ecef;
+  --sidebar-text: #333333;
+  --sidebar-text-active: #ffffff;
+  --sidebar-text-hover: #ffffff;
+  --sidebar-text-muted: #6c757d;
+  --sidebar-active-bg: hsl(var(--heroui-primary) / 1);
+  --sidebar-hover: hsl(var(--heroui-primary) / .5);
 
-[data-theme="light"] .ag-floating-bottom {
   background-color: #ffffff;
   border-top: 1px solid #e5e7eb;
 }
 
-[data-theme="dark"] .ag-floating-bottom {
-  background-color: #1f2937;
+html[data-theme="dark"] {
+  --sidebar-bg: hsla(240, 10%, 10%, 1);
+  --sidebar-header-bg: hsla(240, 10%, 15%, 1);
+  --sidebar-footer-bg: hsla(240, 10%, 15%, 1);
+  --sidebar-border: hsla(0, 0%, 100%, 0.1);
+  --sidebar-text: #e9ecef;
+  --sidebar-text-muted: #adb5bd;
+  --sidebar-active-bg: hsl(var(--heroui-primary) / 1);
+  --sidebar-hover: rgba(255, 255, 255, 0.2);
+  --background-color: #1a1a1a;
+
+  background-color: #1a1a1a;
   border-top: 1px solid #374151;
+}
+
+html, body , #root {
+  background-color: var(--background-color);
+  font-family: 'Montserrat', sans-serif;
+}
+html{
+    height: 100%;
+    overflow: hidden;
+}
+
+[data-overlay-container] {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+
+    height: 100%;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
 }
 
 .ag-custom-loading-overlay {

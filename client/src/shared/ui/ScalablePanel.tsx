@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { pickFirstChildOfType } from "@/shared/lib/react";
 
 const INITIAL_STATE = {
-    isExpanded: true,
+    isExpanded: false,
 };
 
 const ScalablePanel: React.FC<ScalablePanelProps> = ({ children, maxWidth, title="Showcases Panel" }) => {
@@ -35,49 +35,50 @@ const ScalablePanel: React.FC<ScalablePanelProps> = ({ children, maxWidth, title
     }
 
     return (
-        <div className="flex relative">
-            <Card
-                shadow="none"
-                radius="none"
-                className="transition-[width] duration-300"
-                style={{
-                    width: state.isExpanded ? expanded : `${collapsedW}px`,
-                }}
-            >
-                {state.isExpanded && (
-                    <CardHeader className="pt-1 min-h-7">
+        <Card
+            shadow="none"
+            radius="sm"
+            className="border border-gray-200 dark:border-gray-700 h-full flex flex-col"
+            style={{
+                width: state.isExpanded ? expanded : `${collapsedW}px`,
+                transition: 'width 0.3s ease-in-out',
+            }}
+        >
+            <CardHeader className="p-0 pt-1 px-1 min-h-7">
+                {state.isExpanded ? (
+                    <>
+                        <TriggerButton onPress={toggleExpand} isExpanded={state.isExpanded} />
                         {headerEl}
-                    </CardHeader>
+                    </>
+                ) : (
+                    <TriggerButton onPress={toggleExpand} isExpanded={state.isExpanded} />
                 )}
-                <CardBody className="p-0">
-                    {state.isExpanded ? (
-                        <div className="p-2 h-full">
-                            {bodyEl}
-                        </div>
-                    ) : (
-                        <div className="flex justify-center items-center h-full p-2">
-                            <div className="inline-block rotate-90 whitespace-nowrap origin-center">
-                                {title}
-                            </div>
-                        </div>
-                    )}
-                </CardBody>
-                {state.isExpanded && (
-                    <CardFooter>
-                        {footerEl}
-                    </CardFooter>
-                )}
-            </Card>
-            <Button 
-                isIconOnly
-                size="sm" 
-                color="primary"
-                onPress={toggleExpand}
-                className="absolute top-0 -left-8 z-5 bg-black/30 rounded-none hover:bg-black/90"
-            >
-                {state.isExpanded ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            </Button>
-        </div>
+            </CardHeader>
+            <CardBody className="p-0">
+                {/* Развёрнутый контент */}
+                <div
+                    className={`p-2 h-full ${state.isExpanded ? 'block' : 'hidden'}`}
+                    aria-hidden={!state.isExpanded}
+                >
+                    {bodyEl}
+                </div>
+
+                {/* Свернутый вид с вертикальным заголовком */}
+                <div
+                    className={`justify-center items-center h-full p-2 ${state.isExpanded ? 'hidden' : 'flex'}`}
+                    aria-hidden={state.isExpanded}
+                >
+                    <div className="inline-block rotate-90 whitespace-nowrap origin-center">
+                    {title}
+                    </div>
+                </div>
+            </CardBody>
+            {state.isExpanded && (
+                <CardFooter>
+                    {footerEl}
+                </CardFooter>
+            )}
+        </Card>
     );
 }
 
@@ -86,9 +87,27 @@ export default ScalablePanel;
 // ==========================
 // Markers
 // ==========================
-export const ScalablePanelHeader: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className }) => <div className={`${className}`}>{children}</div>;
-export const ScalablePanelBody: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className }) => <div className={`${className}`}>{children}</div>;
-export const ScalablePanelFooter: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className }) => <div className={`${className}`}>{children}</div>;
+export const ScalablePanelHeader: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className }) => <div className={`flex-1 ${className}`}>{children}</div>;
+export const ScalablePanelBody: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className }) => <div className={`flex-1 ${className}`}>{children}</div>;
+export const ScalablePanelFooter: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className }) => <div className={`flex-1 ${className}`}>{children}</div>;
+
+// ==========================
+// Elements
+// ==========================
+const TriggerButton: React.FC<{ onPress: () => void, isExpanded: boolean }> = ({ onPress, isExpanded }) => {
+    return (
+        <Button 
+            isIconOnly
+            size="sm" 
+            variant="flat"
+            color="primary"
+            onPress={onPress}
+            className={`${!isExpanded && 'flex-1'}`}
+        >
+            {isExpanded ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </Button>
+    )
+}
 
 // ==========================
 // Types

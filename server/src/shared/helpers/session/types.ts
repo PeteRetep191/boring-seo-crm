@@ -1,0 +1,1 @@
+export type { CompareMode } from './compare-client-infos';

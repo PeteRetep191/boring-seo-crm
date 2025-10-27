@@ -1,31 +1,39 @@
-import Fastify from 'fastify'
+import App from '@/core/App';
+import EnvManager from '@/core/EnvManager';
+import MongoDBClient from '@/clients/MongoDB.client';
+import Logger from '@/shared/utils/Logger.utils';
 
-const fastify = Fastify({ logger: true })
-
-fastify.get('/', async () => {
-  return { hello: 'world' }
-})
-
-// Пример типизированного маршрута
-fastify.get<{
-  Params: { id: string }
-  Querystring: { q?: string }
-}>('/user/:id', async (req) => {
-  const { id } = req.params
-  const { q } = req.query
-  return { id, q: q ?? null }
-})
-
-const PORT = Number(process.env.PORT) || 3000
-const HOST = process.env.HOST || '0.0.0.0'
-
-const start = async () => {
+async function main() {
   try {
-    await fastify.listen({ port: PORT, host: HOST })
-    console.log(`Server running on http://${HOST}:${PORT}`)
-  } catch (err) {
-    fastify.log.error(err)
-    process.exit(1)
+    await EnvManager.init();
+
+    await MongoDBClient.init({ url: EnvManager.getVar('MONGODB_URI') });
+    await MongoDBClient.connect();
+
+    await App.init();
+    await App.run();
+
+  } catch (error) {
+    console.error(error);
+    Logger.error('Failed to start application:', error);
+    process.exit(1);
   }
 }
-start()
+
+const gracefulShutdown = async (signal: string) => {
+  Logger.info(`Received ${signal}, shutting down gracefully`);
+  try {
+    await MongoDBClient.disconnect();
+    await App.shutdown();
+    Logger.info('All clients disconnected and server shut down gracefully');
+    process.exit(0);
+  } catch (error) {
+    Logger.error('Error during server shutdown:', error);
+    process.exit(1);
+  }
+};
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+main();

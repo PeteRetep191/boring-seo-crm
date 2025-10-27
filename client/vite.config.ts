@@ -14,8 +14,17 @@ export default defineConfig({
     }
   },
   server: {
-    proxy: {
-      '/api': 'http://localhost:5000'
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3004',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        },
+        '/static': {
+          target: 'http://localhost:3004',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/static/, '')
+        }
+      }
     }
-  }
 })

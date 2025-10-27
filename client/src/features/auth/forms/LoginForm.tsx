@@ -1,13 +1,17 @@
 import React from "react";
 // UI
 import { Card, CardHeader, CardBody, Input, Checkbox, Button, Divider, Tooltip } from "@heroui/react";
-// hooks
+// Hooks
 import { useLoginForm } from "@/features/auth/hooks";
 
-
 const LoginForm: React.FC = () => {
+    // ------------------------------
+    // Hooks
+    // ------------------------------
     const loginForm  = useLoginForm();
-
+    // ------------------------------
+    // Render
+    // ------------------------------
     return (
         <Card className="max-w-md w-full mx-auto p-1">
             <CardHeader className="flex items-center justify-between gap-1">

@@ -11,17 +11,16 @@ const ThemeSwitcher: React.FC = () => {
 
     return (
         <Switch
-            defaultSelected = {themeContext?.theme.state.mode === "light"}
+            // isDisabled
+            defaultSelected = {themeContext?.theme.state.mode === "dark"}
             color="primary"
             endContent={<MoonIcon />}
             size="sm"
             startContent={<SunIcon />}
-            isDisabled
-            onChange={() => {
+            onChange={(event) => {
                 if (!themeContext) return;
-                const { theme } = themeContext;
-                const nextMode = theme.state.mode === "light" ? "dark" : "light";
-                theme.actions.switchTheme(nextMode);
+                const nextMode = event.target.checked ? "dark" : "light";
+                themeContext.theme.actions.setTheme(nextMode);
             }}
         />
     );

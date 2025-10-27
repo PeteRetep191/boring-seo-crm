@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useImmer } from "use-immer";
 import { useNavigate } from "react-router-dom";
+// api
+import { login } from "@/api/backend/routes/auth.api";
 // repository
 import { sessionIdRepo } from "@/entities/session-id";
 // utils
@@ -36,22 +38,20 @@ const useLoginForm = (): LoginFormApi => {
         update(draft => {
             draft.isSubmitting = true;
         });
+        
         try {
-            await new Promise<void>(resolve => setTimeout(resolve, 2000));
-            
-            const fakeResponse = {
-                sessionId: "123456",
-                user: {
-                    email: state.formData.email,
-                    name: "John Doe"
-                }
-            };
+            const response = await login({
+                email: state.formData.email,
+                password: state.formData.password,
+                rememberMe: state.formData.rememberMe,
+            });
 
-            sessionIdRepo.saveSessionId(fakeResponse.sessionId);
+            sessionIdRepo.saveSessionId(response.data.result.sessionId);
             toast.success("Login successful!");
             navigate("/");
         } catch (error) {
-            toast.error("Login failed. Please try again.");
+            console.error("Login error:", error);
+            toast.error(`Login failed. ${(error as any).response?.data?.error || (error as Error).message || 'Please try again.'}`);
         } finally {
             update(draft => {
                 draft.isSubmitting = false;

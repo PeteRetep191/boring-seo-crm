@@ -222,7 +222,19 @@ const SiteManagementPage: React.FC = () => {
                             <span className="text-[14px] text-foreground-500">Total Showcases: 1</span>
                         </ScalablePanelFooter>
                     </ScalablePanel>
-                    
+                    <ScalablePanel title="Site API Settings" maxWidth={200}>
+                        <ScalablePanelHeader className="flex flex-1 items-center justify-between gap-4 pt-2">
+                            <h3 className="text-md font-medium truncate">Site API Settings</h3>
+                            
+                        </ScalablePanelHeader>
+                        <ScalablePanelBody>
+                            <></>
+                            {/* <ShowcaseItem /> */}
+                        </ScalablePanelBody>
+                        <ScalablePanelFooter className="flex items-center justify-end gap-2">
+                            <span className="text-[14px] text-foreground-500">Total Showcases: 1</span>
+                        </ScalablePanelFooter>
+                    </ScalablePanel>
                 </div>
             </div>
         </div>

@@ -1,0 +1,1 @@
+export {default as getClientInfo} from './get-client-info';

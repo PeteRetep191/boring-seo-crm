@@ -14,6 +14,8 @@ const SiteManagementPage = lazy( () => import("@/pages/sites/SiteManagementPage"
 const SettingsPage = lazy( () => import("@/pages/SettingsPage"));
 const NotFoundPage = lazy( () => import("@/pages/NotFoundPage"));
 
+const CreateRootUserPage = lazy( () => import("@/pages/CreateRootUserPage"));
+
 // =========================
 // Helpers
 // =========================
@@ -35,6 +37,20 @@ export const router = createBrowserRouter([
                 element: (
                     <Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader /></div>}>
                         <LoginPage />
+                    </Suspense>
+                )
+            }
+        ]
+    },
+    {
+        path: "create-root-user",
+        element: <AuthLayout />,
+        children: [
+            {
+                index: true,
+                element: (
+                    <Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader /></div>}>
+                        <CreateRootUserPage />
                     </Suspense>
                 )
             }

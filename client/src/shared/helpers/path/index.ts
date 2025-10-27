@@ -1,0 +1,1 @@
+export { default as redirectTo } from './redirect-to';

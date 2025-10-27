@@ -9,7 +9,7 @@ const redirectTo = (page: 'home' | 'login') => {
             }
             break;
         case 'login':
-            if(window.location.pathname !== '/login' && window.location.pathname !== '/users/root') {
+            if(window.location.pathname !== '/login') {
                 window.location.href = '/login';
             }
             break;

@@ -15,8 +15,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     queryKey: ["me"],
     queryFn: async() => {
       
-      if(typeof window === 'undefined') return null;
-      if(window.location.pathname === '/login') return null;
+      // if(typeof window === 'undefined') return null;
+      // if(window.location.pathname === '/login') return null;
 
       try {
         const response = await getMe();
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         return response;
       } catch (error) {
-        redirectTo('login');
+        // redirectTo('login');
         return null;
       }
     },

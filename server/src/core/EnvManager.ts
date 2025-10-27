@@ -8,8 +8,8 @@ export const envSchema = z.object({
 
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
 
-  JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
-  COOKIE_SECRET: z.string().min(1, 'COOKIE_SECRET is required'),
+  // JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
+  // COOKIE_SECRET: z.string().min(1, 'COOKIE_SECRET is required'),
 });
 
 export type IEnv = z.infer<typeof envSchema>;

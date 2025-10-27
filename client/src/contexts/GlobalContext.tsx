@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode } from 'react';
 // Hooks
-import { useSidebar, type SidebarHookApi } from '@/hooks/common/useSidebar';
+// import { useSidebar, type SidebarHookApi } from '@/hooks/common/useSidebar';
 
 // ===============================
 // Global Context
@@ -9,12 +9,12 @@ const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   // const theme = useTheme();
-  const sidebar = useSidebar();
+  // const sidebar = useSidebar();
 
   return (
     <GlobalContext.Provider value={{
       // theme,
-      sidebar,
+      // sidebar,
       
       constants: {
         SERVICE_NAME: 'Xerion CRM'
@@ -36,7 +36,7 @@ export const useGlobal = () => {
 // ===============================
 export type GlobalContextType = {
   // theme: ThemeHookApi;
-  sidebar: SidebarHookApi;
+  // sidebar: SidebarHookApi;
   
   constants: {
     SERVICE_NAME: string;

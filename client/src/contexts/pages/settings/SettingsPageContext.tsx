@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode } from 'react';
 // Hooks
-import { useSettingsMenu, type SettingsMenuHookApi } from '@/hooks/contexts/pages/settings/useSettingsMenu';
+// import { useSettingsMenu, type SettingsMenuHookApi } from '@/hooks/contexts/pages/settings/useSettingsMenu';
 
 // ===============================
 // Global Context
@@ -8,11 +8,11 @@ import { useSettingsMenu, type SettingsMenuHookApi } from '@/hooks/contexts/page
 const SettingsPageContext = createContext<GlobalContextType | undefined>(undefined);
 
 export const SettingsPageProvider = ({ children }: { children: ReactNode }) => {
-  const settingsMenu = useSettingsMenu();
+  // const settingsMenu = useSettingsMenu();
 
   return (
     <SettingsPageContext.Provider value={{
-        settingsMenu,
+        // settingsMenu,
 
         constants: {
             SERVICE_NAME: 'Xerion CRM'
@@ -33,7 +33,7 @@ export const useSettingPageContext = () => {
 // Types
 // ===============================
 export type GlobalContextType = {
-    settingsMenu: SettingsMenuHookApi;
+    // settingsMenu: SettingsMenuHookApi;
 
     constants: {
         SERVICE_NAME: string;

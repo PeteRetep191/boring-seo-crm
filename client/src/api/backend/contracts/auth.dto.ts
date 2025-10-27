@@ -1,4 +1,4 @@
-import { BaseApiResponse } from "@/shared/types/api/backend/response.types"
+// import { BaseApiResponse } from "@/shared/types/api/backend/response.types"
 import type { AxiosResponse } from "axios";
 
 // ===============================
@@ -17,11 +17,6 @@ export type LogoutRequestDTO = {
 // ===============================
 // Responses
 // ===============================
-export type LoginResponseDTO = AxiosResponse<BaseApiResponse<{
-    session_id: string;
-    user: any;
-}>>;
+export type LoginResponseDTO = AxiosResponse<any>;
 
-export type LogoutResponseDTO = AxiosResponse<BaseApiResponse<{
-    message: string;
-}>>;
+export type LogoutResponseDTO = AxiosResponse<any>;

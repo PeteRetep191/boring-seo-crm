@@ -1,137 +1,45 @@
+# Node
+node_modules/
 **/node_modules/
 
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-.Icon
-._*
-.Spotlight-V100
-.Trashes
-.fseventsd
-# Windows
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-*.stackdump
+# Build output
+dist/
+build/
+.out/
+.next/
+.nuxt/
+.svelte-kit/
 
-# =========================
-# Общие временные файлы
-# =========================
+# Caches & temp
+.cache/
+tmp/
+temp/
 *.tmp
-*.temp
-*.swp
-*.swo
-*~
-.~lock*
-~$*
-*.bak
-*.old
-*.orig
-*.rej
-
-# Архивы/дампы (часто случайные)
-*.zip
-*.tar
-*.tar.gz
-*.tgz
-*.gz
-*.bz2
-*.7z
-*.rar
-*.dmg
-*.iso
-
-# Логи
-logs/
 *.log
-*.log.*
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+yarn-*.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-# =========================
-# IDE / Editor
-# =========================
-# VS Code
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-.history/
+# Test coverage
+coverage/
+.nyc_output/
 
-# JetBrains (WebStorm/IntelliJ/PhpStorm/etc)
-.idea/
-*.iml
-out/
-
-# Sublime
-*.sublime-workspace
-*.sublime-project
-
-# Vim
-*.sw?
-.session
-.netrwhist
-
-# Emacs
-*~
-\#*\#
-.\#*
-
-# Eclipse
-.project
-.metadata
-.classpath
-.buildpath
-.cproject
-.settings/
-
-# =========================
-# Секреты / настройки
-# =========================
-*.env
-*.env.*.local
+# Env & secrets
+.env
 .env.local
-.envrc
+.env.*.local
 *.key
 *.pem
 *.p12
 
-# =========================
-# Кеши / инструменты
-# =========================
-.cache/
-.caches/
-.tmp/
-temp/
-tmp/
-coverage/
-.nyc_output/
-.parcel-cache/
-.next/
-.nuxt/
-.svelte-kit/
-.angular/
-.happypack/
-.eslintcache
-.stylelintcache
-.prettier-cache
-node_modules/.cache/
+# OS junk
+.DS_Store
+Thumbs.db
 
-# =========================
-# Git
-# =========================
-*.patch
-*.diff
+# IDEs
+.vscode/
+.idea/
+*.iml
 
-# =========================
-# Docker / Compose
-# =========================
+# Docker (override локально)
 docker-compose.override.yml
-docker-compose.*.yml
-docker-compose.ymlnode_modules/
-**/node_modules/

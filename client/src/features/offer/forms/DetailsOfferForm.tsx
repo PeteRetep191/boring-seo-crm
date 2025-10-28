@@ -9,6 +9,7 @@ import { createOffer, updateOffer, getOfferById } from "@/api/backend/routes/off
 import { Card, CardBody, Input, Button, Divider, Tooltip, Textarea } from "@heroui/react";
 // Components
 import SingleFileUploader from "@/features/files/ui/SingleFileUploader";
+import { ArrayStringEditor } from "@/shared/components";
 // DTOs
 import { CreateOfferDTO, UpdateOfferDTO } from "@/api/backend/contracts/offer.dto";
 // Utils
@@ -31,11 +32,10 @@ type State = {
   form: {
     name: string;
     bonus: string;
-    bonusCurrency: string;
-    bonusDescription: string;
-    rating: string;
+    description: string;
+    rating: number;
     partnerUrl: string;
-    brandAdvantages: string;
+    brandAdvantages: string[];
   };
   logoFile: File | null;
   logoUrl: string | null;
@@ -47,11 +47,14 @@ const INITIAL_STATE: State = {
   form: {
     name: "",
     bonus: "",
-    bonusCurrency: "USD",
-    bonusDescription: "",
-    rating: "0",
+    description: "",
+    rating: 0,
     partnerUrl: "",
-    brandAdvantages: "",
+    brandAdvantages: [
+      "Fast delivery",
+      "24/7 customer support",
+      "Money-back guarantee"
+    ],
   },
   logoFile: null,
   logoUrl: null,
@@ -79,11 +82,10 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
     update((draft) => {
       draft.form.name = d.name || "";
       draft.form.bonus = typeof d.bonus === "number" ? String(d.bonus) : d.bonus || "";
-      draft.form.bonusCurrency = d.bonusCurrency || "USD";
-      draft.form.bonusDescription = d.bonusDescription || "";
+      draft.form.description = d.description || "";
       draft.form.rating = typeof d.rating === "number" ? String(d.rating) : d.rating || "0";
       draft.form.partnerUrl = d.partnerUrl || "";
-      draft.form.brandAdvantages = Array.isArray(d.brandAdvantages) ? d.brandAdvantages.join(", ") : "";
+      draft.form.brandAdvantages = Array.isArray(d.brandAdvantages) ? d.brandAdvantages : [];
       draft.logoUrl = d.logoUrl ?? initialLogoUrl ?? null;
       draft.logoFile = null;
     });
@@ -91,20 +93,36 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
 
   // ========= Validation =========
   const validate = () => {
-    const nameOk = state.form.name.trim().length > 0;
-    const ratingNum = Number(state.form.rating);
-    const ratingOk = Number.isFinite(ratingNum) && ratingNum >= 0 && ratingNum <= 5;
-    const bonusNum = Number(state.form.bonus);
-    const bonusOk = Number.isFinite(bonusNum) && bonusNum >= 0;
-    const currOk = state.form.bonusCurrency.trim().length > 0;
-    update((d) => {
-      d.isValid = nameOk && ratingOk && bonusOk && currOk;
-    });
+      const name = (state.form.name ?? "").trim();
+      const bonus = String(state.form.bonus ?? "").trim();
+      const rating = Number(state.form.rating);
+
+      const nameOk = name.length > 0;
+      const bonusOk = bonus.length > 0;
+      const ratingOk = Number.isFinite(rating) && rating >= 0 && rating <= 5;
+
+      update((d) => {
+        d.isValid = nameOk && bonusOk && ratingOk;
+
+        // легка нормалізація
+        d.form.name = name;
+        d.form.bonus = bonus;
+        d.form.rating = rating;
+        
+        if (typeof d.form.description === "string") {
+          const t = d.form.description.trim();
+          d.form.description = t === "" ? "" : t;
+        }
+        if (typeof d.form.partnerUrl === "string") {
+          const t = d.form.partnerUrl.trim();
+          d.form.partnerUrl = t === "" ? "" : t;
+        }
+      });
   };
+
   useEffect(() => {
     validate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.form.name, state.form.rating, state.form.bonus, state.form.bonusCurrency]);
+  }, [state.form]);
 
   // ========= Mutations =========
   const createMut = useMutation({
@@ -129,15 +147,11 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
       // 1) Базовый payload
       const base: Omit<CreateOfferDTO, "logoUrl"> = {
         name: state.form.name.trim(),
-        bonus: Number(state.form.bonus),
-        bonusCurrency: state.form.bonusCurrency.trim(),
-        bonusDescription: state.form.bonusDescription.trim() || undefined,
-        rating: Number(state.form.rating),
+        bonus: state.form.bonus.trim(),
+        description: state.form.description.trim() || undefined,
+        rating: state.form.rating,
         partnerUrl: state.form.partnerUrl.trim() || undefined,
         brandAdvantages: state.form.brandAdvantages
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
       };
 
       // 2) Лого: если выбрали новый файл — грузим, иначе берём текущее/начальное
@@ -233,13 +247,13 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
                 label="Description"
                 variant="bordered"
                 placeholder="Describe bonus terms and highlights"
-                value={state.form.bonusDescription}
+                value={state.form.description}
                 onValueChange={(v) =>
                   update((d) => {
-                    d.form.bonusDescription = v;
+                    d.form.description = v;
                   })
                 }
-                aria-label="field bonusDescription"
+                aria-label="field description"
                 isDisabled={loading}
               />
             </div>
@@ -248,28 +262,10 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
           {/* Ниже — остальные поля */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              type="number"
-              label="Rating (0-5)"
-              variant="bordered"
-              placeholder="4.5"
-              value={state.form.rating}
-              onValueChange={(v) =>
-                update((d) => {
-                  d.form.rating = v;
-                })
-              }
-              aria-label="field rating"
-              min={0}
-              max={5}
-              step={0.1}
-              isDisabled={loading}
-            />
-
-            <Input
-              type="number"
+              type="text"
               label="Bonus"
               variant="bordered"
-              placeholder="100"
+              placeholder="100% up to $3,000 + 220 Bonus Spins"
               value={state.form.bonus}
               onValueChange={(v) =>
                 update((d) => {
@@ -277,23 +273,25 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
                 })
               }
               aria-label="field bonus"
-              min={0}
-              step={1}
               isDisabled={loading}
+              className="col-span-1 md:col-span-2"
             />
-
+            
             <Input
-              type="text"
-              label="Currency"
+              type="number"
+              label="Rating (0-5)"
               variant="bordered"
-              placeholder="USD"
-              value={state.form.bonusCurrency}
+              placeholder="4.5"
+              value={state.form.rating.toString()}
               onValueChange={(v) =>
                 update((d) => {
-                  d.form.bonusCurrency = v;
+                  d.form.rating = parseInt(v);
                 })
               }
-              aria-label="field bonusCurrency"
+              aria-label="field rating"
+              min={0}
+              max={5}
+              step={0.1}
               isDisabled={loading}
             />
 
@@ -312,19 +310,16 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
               isDisabled={loading}
             />
 
-            <Input
-              type="text"
-              label="Brand advantages (comma separated)"
-              variant="bordered"
-              placeholder="Fast payouts, 24/7 support"
-              value={state.form.brandAdvantages}
-              onValueChange={(v) =>
+            <ArrayStringEditor
+              title="Brand Advantages"
+              values={Array.isArray(state.form.brandAdvantages) ? state.form.brandAdvantages : []}
+              onChange={(vals) =>
                 update((d) => {
-                  d.form.brandAdvantages = v;
+                  d.form.brandAdvantages = vals;
                 })
               }
-              aria-label="field brandAdvantages"
-              isDisabled={loading}
+              placeholder="Advantage..."
+              className="col-span-1 md:col-span-2"
             />
           </div>
 

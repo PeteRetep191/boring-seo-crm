@@ -37,7 +37,7 @@ export const TableGrid: React.FC<{props: Props & { onApiReady?: (api:any)=>void 
     return (
         <div className="h-full">
             <AgGridReact
-                headerHeight={50}
+                headerHeight={45}
                 theme={theme}
                 rowData={props.rowData}
                 columnDefs={props.columnDefs}

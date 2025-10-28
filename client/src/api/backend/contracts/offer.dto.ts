@@ -18,9 +18,8 @@ export interface Offer {
 export interface CreateOfferDTO {
   name: string;
   logoUrl?: string | null;
-  bonus: number;
-  bonusCurrency: string;
-  bonusDescription?: string | null;
+  bonus: string;
+  description?: string | null;
   rating: number;
   partnerUrl?: string | null;
   brandAdvantages?: string[];

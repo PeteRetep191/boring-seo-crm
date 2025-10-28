@@ -98,3 +98,5 @@ html{
   -webkit-user-select: text;
   user-select: text;
 }
+
+.ag-cell { line-height: 1.1 !important; }

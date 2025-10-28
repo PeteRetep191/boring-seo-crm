@@ -1,12 +1,11 @@
-import { Schema, Types, Document, model } from 'mongoose';
+import { Schema, Types, Document, model } from "mongoose";
 
 export interface IOffer {
   name: string;
   logoUrl?: string | null;
-  bonus: number;
-  bonusCurrency: string;
-  bonusDescription?: string | null;
-  rating: number; // 0..5
+  bonus: string;
+  description?: string | null;
+  rating: number;
   partnerUrl?: string | null;
   brandAdvantages: string[];
   archived: boolean;
@@ -22,9 +21,8 @@ const offerSchema = new Schema<IOfferDocument>(
   {
     name: { type: String, required: true, trim: true },
     logoUrl: { type: String, trim: true },
-    bonus: { type: Number, required: true, min: 0 },
-    bonusCurrency: { type: String, required: true, trim: true },
-    bonusDescription: { type: String, trim: true },
+    bonus: { type: String, required: true },
+    description: { type: String, trim: true },
     rating: { type: Number, required: true, min: 0, max: 5 },
     partnerUrl: { type: String, trim: true },
     brandAdvantages: { type: [String], default: [] },
@@ -38,9 +36,9 @@ const offerSchema = new Schema<IOfferDocument>(
   }
 );
 
-// Индексы (лёгкие для поиска/сортировки)
+// Індекси під пошук/сортування
 offerSchema.index({ name: 1 });
 offerSchema.index({ archived: 1, createdAt: -1 });
 
-const OfferModel = model<IOfferDocument>('Offer', offerSchema);
+const OfferModel = model<IOfferDocument>("Offer", offerSchema);
 export default OfferModel;

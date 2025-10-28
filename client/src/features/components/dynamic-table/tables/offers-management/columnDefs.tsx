@@ -7,6 +7,8 @@ import { Edit, Trash2, Archive, ArchiveRestore, ExternalLink } from "lucide-reac
 // Libs
 import { formatDateTime } from "@/shared/lib/date";
 
+const PLACEHOLDER_LOGO = "/images/placeholder-logo.webp";
+
 export const offerColumnDefs = [
   {
     colId: "checkbox",
@@ -15,6 +17,7 @@ export const offerColumnDefs = [
     headerCheckboxSelection: true,
     headerCheckboxSelectionFilteredOnly: true,
     pinned: "left",
+    cellStyle: { display: "flex", alignItems: "center" },
     width: 56,
     maxWidth: 56,
     lockPosition: true,
@@ -26,80 +29,69 @@ export const offerColumnDefs = [
   {
     headerName: "Offer",
     field: "name",
-    minWidth: 280,
+    minWidth: 300,
     tooltipField: "name",
     cellRenderer: (params: any) => {
-      const { name, logoUrl } = params.data || {};
+      const { name, logoUrl, rating } = params.data || {};
+      const src = logoUrl ?? PLACEHOLDER_LOGO;
+
+      const r = Math.max(0, Math.min(5, Number(rating ?? 0)));
+      const rounded = Math.round(r);
+      const filled = "★".repeat(rounded);
+      const empty = "☆".repeat(5 - rounded);
+
       return (
         <div className="flex items-center gap-3 py-1">
           <img
-            src={`${logoUrl}` || "/images/placeholder-logo.webp"}
-            alt={name}
-            className="h-8 w-8 rounded object-cover bg-black/10"
+            src={src}
+            alt={name || "Logo"}
+            className="h-12 w-12 rounded object-cover bg-black/10"
+            onError={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
+              if (img.src !== location.origin + PLACEHOLDER_LOGO) img.src = PLACEHOLDER_LOGO;
+            }}
           />
-          <div className="flex flex-col gap-0.5">
-            <span className="text-sm font-medium truncate">{name}</span>
-            {params.data?.brandAdvantages?.length ? (
-              <div className="flex items-center gap-1 flex-wrap">
-                {params.data.brandAdvantages.slice(0, 2).map((adv: string, i: number) => (
-                  <Chip key={i} size="sm" variant="flat" color="default" className="h-5">
-                    {adv}
-                  </Chip>
-                ))}
-                {params.data.brandAdvantages.length > 2 && (
-                  <Chip size="sm" variant="flat" color="default" className="h-5">
-                    +{params.data.brandAdvantages.length - 2}
-                  </Chip>
-                )}
-              </div>
-            ) : (
-              <span className="text-xs text-gray-500 dark:text-gray-400">—</span>
-            )}
+          <div className="flex flex-col gap-1 min-w-0">
+            <span className="text-xs font-medium truncate" title={name}>
+              {name}
+            </span>
+
+            <div className="flex items-center gap-2" aria-label={`Rating ${r.toFixed(1)} of 5`}>
+              <span className="text-base leading-none">
+                <span className="text-yellow-500 text-xs">{filled}</span>
+                <span className="text-gray-400">{empty}</span>
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                ({Number(r).toFixed(1)}/5)
+              </span>
+            </div>
           </div>
         </div>
       );
     },
-    tooltipValueGetter: (p: any) =>
-      p?.data?.brandAdvantages?.length
-        ? `${p.data.name}\n${p.data.brandAdvantages.join(", ")}`
-        : p?.data?.name || "",
+    tooltipValueGetter: (p: any) => p?.data?.name || "",
   },
   {
     headerName: "Bonus",
     field: "bonus",
-    minWidth: 220,
-    cellStyle: { display: "flex", alignItems: "center" },
-    tooltipValueGetter: (p: any) =>
-      p?.data?.bonusDescription || (p?.data ? `Bonus: ${p.data.bonus} ${p.data.bonusCurrency}` : ""),
-    cellRenderer: (params: any) => {
-      const { bonus, bonusCurrency, bonusDescription } = params.data || {};
-      const num = typeof bonus === "number" ? bonus : 0;
-      const formatted = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(num);
-      return (
-        <Chip size="sm" variant="flat" color="success" className="w-fit">
-          +{formatted} {bonusCurrency} {bonusDescription || "—"}
-        </Chip>
-      );
-    },
-  },
-  {
-    headerName: "Rating",
-    field: "rating",
     minWidth: 200,
-    tooltipField: "rating",
     cellStyle: { display: "flex", alignItems: "center" },
+    tooltipValueGetter: (p: any) => {
+      const hasDesc = typeof p?.data?.description === "string" && p.data.description.trim().length > 0;
+      return p?.data
+        ? hasDesc
+          ? `${p.data.bonus} — ${p.data.description}`
+          : `Bonus: ${p.data.bonus}`
+        : "";
+    },
     cellRenderer: (params: any) => {
-      const r = Math.max(0, Math.min(5, Number(params.data?.rating ?? 0)));
-      const filled = "★".repeat(Math.round(r));
-      const empty = "☆".repeat(5 - Math.round(r));
+      const { bonus, description } = params.data || {};
+      const bonusText = String(bonus ?? "").trim();
+      const text = description ? `${bonusText} — ${description}` : bonusText;
       return (
-        <div className="flex items-center gap-2">
-          <span className="text-base leading-none">
-            <span className="text-yellow-500">{filled}</span>
-            <span className="text-gray-400">{empty}</span>
-          </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">({Number(r).toFixed(1)}/5)</span>
-        </div>
+        <span className="text-xs whitespace-pre-wrap wrap-break-words">
+          {text || "—"}
+        </span>
       );
     },
   },
@@ -107,6 +99,7 @@ export const offerColumnDefs = [
     headerName: "Partner",
     field: "partnerUrl",
     minWidth: 140,
+    cellStyle: { display: "flex", alignItems: "center" },
     tooltipField: "partnerUrl",
     cellRenderer: (params: any) => {
       const url = params.data?.partnerUrl;
@@ -132,6 +125,7 @@ export const offerColumnDefs = [
     field: "archived",
     minWidth: 120,
     tooltipField: "archived",
+    cellStyle: { display: "flex", alignItems: "center" },
     cellRenderer: (params: any) => {
       const archived = !!params.data?.archived;
       return (
@@ -144,7 +138,8 @@ export const offerColumnDefs = [
   {
     headerName: "Created At",
     field: "createdAt",
-    minWidth: 220,
+    minWidth: 200,
+    cellStyle: { display: "flex", alignItems: "center" },
     tooltipField: "createdAt",
     cellRenderer: (params: any) => (
       <span className="text-sm">
@@ -155,8 +150,9 @@ export const offerColumnDefs = [
   {
     headerName: "Updated At",
     field: "updatedAt",
-    minWidth: 220,
+    minWidth: 200,
     tooltipField: "updatedAt",
+    cellStyle: { display: "flex", alignItems: "center" },
     cellRenderer: (params: any) => (
       <span className="text-sm">
         {params.data?.updatedAt ? formatDateTime(params.data.updatedAt, { full: true }) : "—"}
@@ -167,9 +163,10 @@ export const offerColumnDefs = [
     colId: "actions",
     headerName: "Actions",
     pinned: "right",
-    width: 160,
-    minWidth: 160,
-    maxWidth: 160,
+    cellStyle: { display: "flex", alignItems: "center" },
+    width: 168,
+    minWidth: 168,
+    maxWidth: 180,
     lockPosition: true,
     suppressMovable: true,
     resizable: false,
@@ -180,13 +177,13 @@ export const offerColumnDefs = [
       const archived = !!params.data?.archived;
 
       return (
-        <div className="flex items-center gap-2 pt-2">
+        <div className="flex items-center gap-2">
           <Button
             isIconOnly
             size="sm"
             variant="flat"
             color="default"
-            onPress={() => params.context.onEditRow?.(params.data?._id)}
+            onPress={() => params.context.onEditRow?.(id)}
             aria-label="Edit offer"
           >
             <Edit size={18} />
@@ -202,7 +199,7 @@ export const offerColumnDefs = [
             approveLabel={archived ? "Unarchive" : "Archive"}
             cancelLabel="Cancel"
             approveColor={archived ? "success" : "default"}
-            onApprove={() => params.context.onToggleArchive?.(params.data?._id, !archived)}
+            onApprove={() => params.context.onToggleArchive?.(id, !archived)}
           >
             <Button
               isIconOnly
@@ -224,7 +221,7 @@ export const offerColumnDefs = [
               approveLabel="Yes, Delete"
               cancelLabel="Cancel"
               approveColor="danger"
-              onApprove={() => params.context.onDeleteRow?.(params.data?._id)}
+              onApprove={() => params.context.onDeleteRow?.(id)}
             >
               <Button isIconOnly size="sm" variant="flat" color="danger" aria-label="Delete offer">
                 <Trash2 size={18} />

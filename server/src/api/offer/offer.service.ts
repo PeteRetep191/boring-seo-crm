@@ -1,9 +1,23 @@
-import { Types } from 'mongoose';
-import OfferModel, { IOfferDocument } from '@/models/offer.model';
-import * as OfferDTOs from './offer.dto';
-import { buildFiltersMatch } from '@/shared/utils/mongo';
+import { Types } from "mongoose";
+import OfferModel, { IOfferDocument } from "@/models/offer.model";
+import * as OfferDTOs from "./offer.dto";
+import { buildFiltersMatch } from "@/shared/utils/mongo";
 
-// Список с пагинацией/поиском
+type OfferUpsert = Partial<
+  Pick<
+    OfferDTOs.OfferDTO,
+    | "name"
+    | "logoUrl"
+    | "bonus"
+    | "description"
+    | "rating"
+    | "partnerUrl"
+    | "brandAdvantages"
+    | "archived"
+  >
+>;
+
+// ---- Список з пагінацією/пошуком ----
 export const fetchOffers = async (
   opts: OfferDTOs.FetchOffersDTO
 ): Promise<{
@@ -13,9 +27,9 @@ export const fetchOffers = async (
 }> => {
   const { search, page, limit } = opts;
 
-  const searchRx = search?.trim() ? new RegExp(search.trim(), 'i') : null;
+  const searchRx = search?.trim() ? new RegExp(search.trim(), "i") : null;
   const and: any[] = [{ archived: { $ne: true } }];
-  if (searchRx) and.push({ $or: [{ name: searchRx }, { bonusCurrency: searchRx }] });
+  if (searchRx) and.push({ $or: [{ name: searchRx }, { description: searchRx }] });
 
   const filtersMatch = buildFiltersMatch?.(opts.filters);
   if (filtersMatch) and.push(filtersMatch);
@@ -28,14 +42,15 @@ export const fetchOffers = async (
     {
       $facet: {
         results: [{ $skip: (page - 1) * limit }, { $limit: limit }],
-        total: [{ $count: 'count' }],
+        total: [{ $count: "count" }],
       },
     }
   );
 
   const agg = await OfferModel.aggregate(pipeline);
   const facet = agg[0] || { results: [], total: [] };
-  const offers = facet.results as IOfferDocument[];
+  // hydrate → IOfferDocument[]
+  const offers = (facet.results as any[]).map((o) => OfferModel.hydrate(o)) as IOfferDocument[];
   const total = facet.total[0]?.count ?? 0;
 
   return {
@@ -47,25 +62,12 @@ export const fetchOffers = async (
 
 export const getOfferById = async (id: string): Promise<IOfferDocument | null> => {
   if (!Types.ObjectId.isValid(id)) return null;
-  return OfferModel.findById(id).lean();
+  return OfferModel.findById(id);
 };
-
-/** ---------- ЕДИНЫЙ UPSERT ПО ID ---------- */
-type UpsertOfferInput = Partial<{
-  name: string;
-  logoUrl: string | null;
-  bonus: number;
-  bonusCurrency: string;
-  bonusDescription: string | null;
-  rating: number;
-  partnerUrl: string | null;
-  brandAdvantages: string[];
-  archived: boolean;
-}>;
 
 export const upsertOffer = async (
   id: string | Types.ObjectId | undefined,
-  data: UpsertOfferInput
+  data: OfferUpsert
 ): Promise<IOfferDocument> => {
   const _id =
     id && Types.ObjectId.isValid(String(id))
@@ -76,8 +78,7 @@ export const upsertOffer = async (
   if (data.name !== undefined) update.name = data.name;
   if (data.logoUrl !== undefined) update.logoUrl = data.logoUrl;
   if (data.bonus !== undefined) update.bonus = data.bonus;
-  if (data.bonusCurrency !== undefined) update.bonusCurrency = data.bonusCurrency;
-  if (data.bonusDescription !== undefined) update.bonusDescription = data.bonusDescription;
+  if (data.description !== undefined) update.description = data.description;
   if (data.rating !== undefined) update.rating = data.rating;
   if (data.partnerUrl !== undefined) update.partnerUrl = data.partnerUrl;
   if (data.brandAdvantages !== undefined) update.brandAdvantages = data.brandAdvantages;
@@ -86,26 +87,18 @@ export const upsertOffer = async (
   const doc = await OfferModel.findOneAndUpdate(
     { _id },
     { $set: update },
-    {
-      upsert: true,
-      new: true,
-      runValidators: true,
-      setDefaultsOnInsert: true,
-    }
+    { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
   );
 
   return doc!;
 };
-/** ---------------------------------------- */
 
 export const archiveOffer = async (id: string): Promise<boolean> => {
   if (!Types.ObjectId.isValid(id)) return false;
-
   const updated = await OfferModel.findByIdAndUpdate(
     id,
     { $set: { archived: true } },
     { new: true, runValidators: true }
   );
-
   return !!updated;
 };

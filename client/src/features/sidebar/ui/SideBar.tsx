@@ -13,6 +13,7 @@ type NavItem = {
   label: string;
   to: string;
   icon: React.ReactNode;
+  isDisabled?: boolean;
 };
 
 // ===============================
@@ -21,8 +22,8 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', icon: <ChartPie />, to: '/' },
   { label: 'Offers', icon: <Tags />, to: '/offers' },
-  { label: 'Sites', icon: <Link2 />, to: '/sites' },
-  { label: 'Settings', icon: <Settings />, to: '/settings' },
+  { label: 'Sites', icon: <Link2 />, to: '/sites', isDisabled: true },
+  { label: 'Settings', icon: <Settings />, to: '/settings', isDisabled: true },
 ];
 
 // Small helper for active state
@@ -59,7 +60,6 @@ const SideBar: React.FC = () => {
           flexDirection: 'column',
           gap: '100px',
           border: 'none',
-          // make container transparent to let our header/footer colors show through
           '.ps-sidebar-container': {
             backgroundColor: 'transparent',
           },
@@ -110,7 +110,7 @@ const SideBar: React.FC = () => {
                 isDisabled={!isCollapsed}
                 content={item.label}
               >
-                <MenuItem icon={item.icon} component={<Link to={item.to} />} active={active}>
+                <MenuItem icon={item.icon} component={<Link to={item.to} />} active={active} disabled={item.isDisabled} className={item.isDisabled ? 'opacity-50 cursor-not-allowed' : ''}>
                   {item.label}
                 </MenuItem>
               </Tooltip>

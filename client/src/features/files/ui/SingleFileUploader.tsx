@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Card, CardBody, Button, Tooltip } from "@heroui/react";
-import { Image as ImageIcon, UploadCloud, X } from "lucide-react";
+import { Card, CardBody } from "@heroui/react";
+import { Image as ImageIcon } from "lucide-react";
 
 type SingleFileUploaderProps = {
   valueUrl?: string | null;
@@ -42,7 +42,6 @@ const SingleFileUploader: React.FC<SingleFileUploaderProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -78,12 +77,10 @@ const SingleFileUploader: React.FC<SingleFileUploaderProps> = ({
       const file = files[0];
       const err = validate(file);
       if (err) {
-        setError(err);
         setSelectedFile(null);
         onChange(null);
         return;
       }
-      setError(null);
       setSelectedFile(file);
       onChange(file);
     },
@@ -129,17 +126,11 @@ const SingleFileUploader: React.FC<SingleFileUploaderProps> = ({
     [disabled]
   );
 
-  const clearSelection = useCallback(() => {
-    setSelectedFile(null);
-    setError(null);
-    onChange(null);
-  }, [onChange]);
-
   const hasPreview = Boolean(previewUrl || valueUrl);
   const shownImage = previewUrl || valueUrl || "";
 
   return (
-    <div className={className}>
+    <>
       <input
         ref={inputRef}
         type="file"
@@ -150,66 +141,44 @@ const SingleFileUploader: React.FC<SingleFileUploaderProps> = ({
       />
 
       <Card
+        radius="md"
+        shadow="sm"
+        isHoverable
         isPressable={!disabled}
         onPress={pickFile}
-        className={[
-          "w-full border-2 rounded-xl",
-          dragActive ? "border-primary border-dashed" : "border-dashed border-default-200",
-          disabled ? "opacity-60 pointer-events-none" : "cursor-pointer",
-        ].join(" ")}
+        className="h-full"
       >
-        <CardBody className="p-0">
+        <CardBody className="p-0 h-full">
           {hasPreview ? (
-            <div className="relative">
-              <img
+            <img
                 src={shownImage}
                 alt="preview"
-                className="w-full h-56 object-cover rounded-xl"
+                className="w-full h-full object-cover rounded-xl"
                 draggable={false}
               />
-              <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 p-2 bg-black/40 rounded-b-xl">
-                <Tooltip content="Выбрать другой файл">
-                  <Button size="sm" color="primary" variant="flat" onPress={pickFile}>
-                    <UploadCloud size={18} />
-                  </Button>
-                </Tooltip>
-                <Tooltip content="Убрать выбранный файл">
-                  <Button
-                    size="sm"
-                    color="danger"
-                    variant="flat"
-                    isIconOnly
-                    onPress={clearSelection}
-                  >
-                    <X size={18} />
-                  </Button>
-                </Tooltip>
-              </div>
-            </div>
           ) : (
             <div
               onDrop={onDrop}
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
-              className={[
-                "flex flex-col items-center justify-center",
-                "h-44 w-full rounded-xl",
-                dragActive ? "bg-primary/5" : "bg-default-50",
-                "transition-colors p-4 text-center select-none",
-              ].join(" ")}
+              className={`flex h-full w-full items-center justify-center rounded-xl border-2 border-dashed
+                ${dragActive ? "border-primary-500 bg-primary-50" : "border-foreground-300 bg-background-100"}
+                ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                ${className || ""}
+              `}
             >
-              <ImageIcon className="opacity-70" size={36} />
-              <span className="mt-2 text-xs text-foreground-500">{placeholderText}</span>
-              {description ? (
-                <span className="mt-1 text-[11px] text-foreground-400">{description}</span>
-              ) : null}
+              <div className="text-center p-3">
+                <ImageIcon className="opacity-70 mx-auto" size={36} />
+                <span className="mt-2 text-xs text-foreground-500">{placeholderText}</span>
+                {description ? (
+                  <span className="mt-1 text-[11px] text-foreground-400">{description}</span>
+                ) : null}
+              </div>
             </div>
           )}
         </CardBody>
       </Card>
-
-      {error ? <p className="mt-2 text-danger text-sm">{error}</p> : null}
-    </div>
+    </>
   );
 };
 

@@ -191,17 +191,16 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
   const loading = isFetching || state.isSubmitting;
 
   return (
-    <Card className="max-w-4xl w-full mx-auto p-1">
+    <Card
+      radius="sm"
+      shadow="none"
+    >
       <CardBody>
         <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
           <div className="flex  gap-4">
             {/* Фото слева */}
-            <div className="shrink-0">
-              {/* <label className="text-sm mb-2 block text-foreground-600">Logo</label> */}
-              <div className="w-44">
-                {/* квадратный контейнер */}
-                <div className="aspect-square overflow-hidden rounded-lg border border-default-200">
-                  <SingleFileUploader
+            <div className="shrink-0 flex-1">
+              <SingleFileUploader
                     valueUrl={state.logoFile ? null : state.logoUrl ?? undefined}
                     onChange={(file) =>
                       update((d) => {
@@ -210,14 +209,12 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
                     }
                     accept={["image/*"]}
                     maxSizeMb={5}
-                    description="PNG, JPG, WEBP до 5 МБ"
+                    description=": PNG, JPG, WEBP up to 5 MB"
                   />
-                </div>
-              </div>
             </div>
 
             {/* Справа — Name + Description в колонке */}
-            <div className="flex flex-1 flex-col gap-4">
+            <div className="flex flex-2 flex-col gap-4">
               <Input
                 type="text"
                 label="Name"
@@ -334,23 +331,6 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
           <Divider />
 
           <div className="flex items-center justify-end gap-2">
-            <Tooltip content="Сбросить форму">
-              <Button
-                variant="flat"
-                onPress={() =>
-                  update(() => ({
-                    ...INITIAL_STATE,
-                    logoUrl: isEdit
-                      ? (offerResp?.data ?? offerResp)?.logoUrl ?? initialLogoUrl ?? null
-                      : initialLogoUrl ?? null,
-                  }))
-                }
-                type="button"
-                isDisabled={loading}
-              >
-                Reset
-              </Button>
-            </Tooltip>
             <Button
               type="submit"
               color="primary"

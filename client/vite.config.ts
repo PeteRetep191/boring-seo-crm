@@ -14,17 +14,17 @@ export default defineConfig({
     }
   },
   server: {
-      // proxy: {
-      //   '/api': {
-      //     target: 'http://localhost:3004',
-      //     changeOrigin: true,
-      //     rewrite: (path) => path.replace(/^\/api/, '')
-      //   },
-      //   '/static': {
-      //     target: 'http://localhost:3004',
-      //     changeOrigin: true,
-      //     rewrite: (path) => path.replace(/^\/static/, '')
-      //   }
-      // }
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3004',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        },
+        '/static': {
+          target: 'http://localhost:3004',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/static/, '')
+        }
+      }
     }
 })

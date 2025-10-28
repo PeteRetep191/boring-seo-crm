@@ -4,38 +4,10 @@ import { useImmer } from "use-immer";
 // Context
 import { useAuthContext } from "@/core/providers/AuthProvider";
 // API
-import {
-  fetchOffers,
-  updateOffer,
-  deleteOfferById,
-} from "@/api/backend/routes/offer.api";
-// UI
-import {
-  Button,
-  Input,
-  Divider,
-  Pagination,
-  Select,
-  SelectItem,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-} from "@heroui/react";
-// UI Components
-import {
-  DynamicTable,
-  DynamicTableBody,
-  DynamicTableFooter,
-  DynamicTableHeader,
-  TableGrid,
-} from "@/features/components/dynamic-table/ui";
-import {
-  ScalablePanel,
-  ScalablePanelHeader,
-  ScalablePanelFooter,
-  ScalablePanelBody,
-} from "@/shared/ui";
+import { fetchOffers, updateOffer, deleteOfferById } from "@/api/backend/routes/offer.api"; 
+import { Button, Input, Divider, Pagination, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/react"; 
+import { DynamicTable, DynamicTableBody, DynamicTableFooter, DynamicTableHeader } from "@/features/components/dynamic-table/ui"; 
+import { ScalablePanel, ScalablePanelHeader, ScalablePanelFooter, ScalablePanelBody } from "@/shared/ui";
 // Icons
 import { Search, RefreshCcw, Plus } from "lucide-react";
 // Table
@@ -174,7 +146,7 @@ const OffersPage: React.FC = () => {
               type="search"
               placeholder="Search offers..."
               className="w-full"
-              variant="bordered"
+              variant="flat"
               startContent={<Search size={16} className="text-gray-500" />}
               size="md"
               value={searchInput}
@@ -186,7 +158,8 @@ const OffersPage: React.FC = () => {
 
           <div className="flex items-center justify-end gap-2">
             <Button
-              variant="solid"
+              radius="sm"
+              variant="flat"
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() =>
@@ -199,12 +172,15 @@ const OffersPage: React.FC = () => {
             </Button>
             <Button
               isIconOnly
+              radius="sm"
+              color="primary"
               variant="flat"
               onPress={() => refetch()}
               isDisabled={isFetching}
               aria-label="Refresh"
+              className="w-[50px]"
             >
-              <RefreshCcw size={18} />
+              <RefreshCcw size={20} />
             </Button>
           </div>
         </DynamicTableHeader>
@@ -231,7 +207,7 @@ const OffersPage: React.FC = () => {
           <ScalablePanel maxWidth={300} title="Quick Filters">
             <ScalablePanelHeader className="w-full">
               <div className="flex items-center justify-end pr-2">
-                <h3 className="text-lg truncate">Quick Filters</h3>
+                <h3 className="text-md truncate">Quick Filters</h3>
               </div>
             </ScalablePanelHeader>
             <ScalablePanelBody>
@@ -289,7 +265,6 @@ const OffersPage: React.FC = () => {
                   d.pagination.page = page;
                 })
               }
-              classNames={{ base: "text-gray-300", item: "text-gray-300" }}
               showControls
             />
           </div>

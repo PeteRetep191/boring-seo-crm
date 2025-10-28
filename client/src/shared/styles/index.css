@@ -26,9 +26,6 @@ html[data-theme="light"] {
   --sidebar-text-muted: #6c757d;
   --sidebar-active-bg: hsl(var(--heroui-primary) / 1);
   --sidebar-hover: hsl(var(--heroui-primary) / .5);
-
-  background-color: #ffffff;
-  border-top: 1px solid #e5e7eb;
 }
 
 html[data-theme="dark"] {
@@ -40,10 +37,7 @@ html[data-theme="dark"] {
   --sidebar-text-muted: #adb5bd;
   --sidebar-active-bg: hsl(var(--heroui-primary) / 1);
   --sidebar-hover: rgba(255, 255, 255, 0.2);
-  --background-color: #1a1a1a;
-
-  background-color: #1a1a1a;
-  border-top: 1px solid #374151;
+  --background-color: #1e1e1e;
 }
 
 html, body , #root {

@@ -24,7 +24,6 @@ const createAxiosInstance = (props: CreateAxiosInstanceProps): AxiosInstance => 
   const instance = axios.create({
     baseURL,
     timeout: DEFAULT_TIMEOUT,
-    // ВАЖНО: не фиксируем здесь Content-Type!
     ...config,
   });
 
@@ -39,15 +38,12 @@ const createAxiosInstance = (props: CreateAxiosInstanceProps): AxiosInstance => 
 
     // Content-Type
     if (isFormData(cfg.data)) {
-      // Даем axios самому добавить boundary
-      // Axios v1: headers — AxiosHeaders; безопасно удалить так:
       try {
         (cfg.headers as any).delete?.('Content-Type');
       } catch {
         (cfg.headers as any)['Content-Type'] = undefined;
       }
     } else {
-      // Для прочих — по умолчанию JSON (если не задан)
       if (!(cfg.headers as any)['Content-Type']) {
         (cfg.headers as any)['Content-Type'] = 'application/json';
       }

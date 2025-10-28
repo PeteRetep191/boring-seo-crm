@@ -9,6 +9,7 @@ import userRoutes from '@/api/user/user.routes';
 import authRoutes from '@/api/auth/auth.routes';
 import offerRoutes from '@/api/offer/offer.routes';
 import filesRoutes from '@/api/files/files.routes';
+import dashboardRoutes from '@/api/dashboard/dashboard.routes';
 
 class Router {
     private fastify: FastifyInstance;
@@ -31,6 +32,7 @@ class Router {
             await fastify.register(userRoutes, { prefix: '/users' });
             await fastify.register(offerRoutes, { prefix: '/offers' });
             await fastify.register(filesRoutes, { prefix: '/files' });
+            await fastify.register(dashboardRoutes, { prefix: '/dashboard' });
         });
 
         await this.registerHealthRoutes();

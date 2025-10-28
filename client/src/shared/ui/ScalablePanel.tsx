@@ -19,7 +19,7 @@ const ScalablePanel: React.FC<ScalablePanelProps> = ({ children, maxWidth, title
     const bodyEl = pickFirstChildOfType(children, ScalablePanelBody);
     const footerEl = pickFirstChildOfType(children, ScalablePanelFooter);
 
-    const minW = 300;
+    const minW = 350;
     const maxW = typeof maxWidth === 'number' ? maxWidth : 650;
     const collapsedW = 50;
     const preferred = `min(35vw, ${maxW}px)`;
@@ -36,9 +36,9 @@ const ScalablePanel: React.FC<ScalablePanelProps> = ({ children, maxWidth, title
 
     return (
         <Card
-            shadow="none"
+            shadow="sm"
             radius="sm"
-            className="border border-gray-200 dark:border-gray-700 h-full flex flex-col"
+            className="h-full flex flex-col"
             style={{
                 width: state.isExpanded ? expanded : `${collapsedW}px`,
                 transition: 'width 0.3s ease-in-out',
@@ -55,21 +55,18 @@ const ScalablePanel: React.FC<ScalablePanelProps> = ({ children, maxWidth, title
                 )}
             </CardHeader>
             <CardBody className="p-0">
-                {/* Развёрнутый контент */}
                 <div
                     className={`p-2 h-full ${state.isExpanded ? 'block' : 'hidden'}`}
                     aria-hidden={!state.isExpanded}
                 >
                     {bodyEl}
                 </div>
-
-                {/* Свернутый вид с вертикальным заголовком */}
                 <div
                     className={`justify-center items-center h-full p-2 ${state.isExpanded ? 'hidden' : 'flex'}`}
                     aria-hidden={state.isExpanded}
                 >
                     <div className="inline-block rotate-90 whitespace-nowrap origin-center">
-                    {title}
+                        {title}
                     </div>
                 </div>
             </CardBody>

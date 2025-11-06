@@ -8,7 +8,7 @@ export interface IOffer {
   rating: number;
   partnerUrl?: string | null;
   brandAdvantages: string[];
-  isActive: boolean;
+  status: boolean;
   archived: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -25,9 +25,9 @@ const offerSchema = new Schema<IOfferDocument>(
     bonus: { type: String, required: true },
     description: { type: String, trim: true },
     rating: { type: Number, required: true, min: 0, max: 5 },
-    isActive: { type: Boolean, default: true },
     partnerUrl: { type: String, trim: true },
     brandAdvantages: { type: [String], default: [] },
+    status: { type: Boolean, default: true },
     archived: { type: Boolean, default: false },
   },
   {

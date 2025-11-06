@@ -22,7 +22,8 @@ export type OfferDTO = {
   rating: number;
   partnerUrl?: string | null;
   brandAdvantages: string[];
+  isActive?: boolean;
   archived: boolean;
-  createdAt: string;  // ISO
-  updatedAt: string;  // ISO
+  createdAt: string; // ISO
+  updatedAt: string; // ISO
 };

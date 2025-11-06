@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import OfferModel, { IOfferDocument } from "@/models/offer.model";
-import * as OfferDTOs from "./offer.dto";
+import * as OfferDTOs from "./dtos";
 import { buildFiltersMatch } from "@/shared/utils/mongo";
 
 type OfferUpsert = Partial<
@@ -12,13 +12,11 @@ type OfferUpsert = Partial<
     | "description"
     | "rating"
     | "partnerUrl"
-    | "isActive"
     | "brandAdvantages"
     | "archived"
   >
 >;
 
-// ---- Список з пагінацією/пошуком ----
 export const fetchOffers = async (
   opts: OfferDTOs.FetchOffersDTO,
 ): Promise<{
@@ -31,7 +29,9 @@ export const fetchOffers = async (
   const searchRx = search?.trim() ? new RegExp(search.trim(), "i") : null;
   const and: any[] = [{ archived: { $ne: true } }];
   if (searchRx)
-    and.push({ $or: [{ name: searchRx }, { description: searchRx }] });
+    and.push({
+      $or: [{ name: searchRx }, { description: searchRx }, { bonus: searchRx }],
+    });
 
   const filtersMatch = buildFiltersMatch?.(opts.filters);
   if (filtersMatch) and.push(filtersMatch);
@@ -51,7 +51,6 @@ export const fetchOffers = async (
 
   const agg = await OfferModel.aggregate(pipeline);
   const facet = agg[0] || { results: [], total: [] };
-  // hydrate → IOfferDocument[]
   const offers = (facet.results as any[]).map((o) =>
     OfferModel.hydrate(o),
   ) as IOfferDocument[];
@@ -87,7 +86,6 @@ export const upsertOffer = async (
   if (data.description !== undefined) update.description = data.description;
   if (data.rating !== undefined) update.rating = data.rating;
   if (data.partnerUrl !== undefined) update.partnerUrl = data.partnerUrl;
-  if (data.isActive !== undefined) update.isActive = data.isActive;
   if (data.brandAdvantages !== undefined)
     update.brandAdvantages = data.brandAdvantages;
   if (data.archived !== undefined) update.archived = data.archived;

@@ -1,1 +1,0 @@
-import{y as t,j as e,x as a}from"./index-fxWXY8PR.js";const r=()=>{const s=t();return e.jsxs("div",{children:[e.jsx("h1",{children:"Sites"}),e.jsx(a,{onPress:()=>{s("/sites/create-new")},children:"Create New Site"})]})};export{r as default};

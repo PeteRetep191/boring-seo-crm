@@ -4,14 +4,29 @@ import { useImmer } from "use-immer";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 // API
 import { uploadFile } from "@/api/backend/routes/file.api";
-import { createOffer, updateOffer, getOfferById } from "@/api/backend/routes/offer.api";
+import {
+  createOffer,
+  updateOffer,
+  getOfferById,
+} from "@/api/backend/routes/offer.api";
 // UI
-import { Card, CardBody, Input, Button, Divider, Tooltip, Textarea } from "@heroui/react";
+import {
+  Card,
+  CardBody,
+  Input,
+  Button,
+  Divider,
+  Tooltip,
+  Textarea,
+} from "@heroui/react";
 // Components
 import SingleFileUploader from "@/features/files/ui/SingleFileUploader";
 import { ArrayStringEditor } from "@/shared/components";
 // DTOs
-import { CreateOfferDTO, UpdateOfferDTO } from "@/api/backend/contracts/offer.dto";
+import {
+  CreateOfferDTO,
+  UpdateOfferDTO,
+} from "@/api/backend/contracts/offer.dto";
 // Utils
 import toast from "react-hot-toast";
 
@@ -35,6 +50,7 @@ type State = {
     description: string;
     rating: number;
     partnerUrl: string;
+    // isActive?: boolean;
     brandAdvantages: string[];
   };
   logoFile: File | null;
@@ -53,15 +69,23 @@ const INITIAL_STATE: State = {
     brandAdvantages: [
       "Fast delivery",
       "24/7 customer support",
-      "Money-back guarantee"
+      "Money-back guarantee",
     ],
   },
   logoFile: null,
   logoUrl: null,
 };
 
-const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onClose, onSaved }) => {
-  const [state, update] = useImmer<State>({ ...INITIAL_STATE, logoUrl: initialLogoUrl });
+const DetailsOfferForm: React.FC<Props> = ({
+  offerId,
+  initialLogoUrl = null,
+  onClose,
+  onSaved,
+}) => {
+  const [state, update] = useImmer<State>({
+    ...INITIAL_STATE,
+    logoUrl: initialLogoUrl,
+  });
   const queryClient = useQueryClient();
   const isEdit = Boolean(offerId);
 
@@ -81,11 +105,15 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
     console.log("Loaded offer for edit:", d);
     update((draft) => {
       draft.form.name = d.name || "";
-      draft.form.bonus = typeof d.bonus === "number" ? String(d.bonus) : d.bonus || "";
+      draft.form.bonus =
+        typeof d.bonus === "number" ? String(d.bonus) : d.bonus || "";
       draft.form.description = d.description || "";
-      draft.form.rating = typeof d.rating === "number" ? String(d.rating) : d.rating || "0";
+      draft.form.rating =
+        typeof d.rating === "number" ? String(d.rating) : d.rating || "0";
       draft.form.partnerUrl = d.partnerUrl || "";
-      draft.form.brandAdvantages = Array.isArray(d.brandAdvantages) ? d.brandAdvantages : [];
+      draft.form.brandAdvantages = Array.isArray(d.brandAdvantages)
+        ? d.brandAdvantages
+        : [];
       draft.logoUrl = d.logoUrl ?? initialLogoUrl ?? null;
       draft.logoFile = null;
     });
@@ -93,31 +121,31 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
 
   // ========= Validation =========
   const validate = () => {
-      const name = (state.form.name ?? "").trim();
-      const bonus = String(state.form.bonus ?? "").trim();
-      const rating = Number(state.form.rating);
+    const name = state.form.name ?? "";
+    const bonus = String(state.form.bonus ?? "");
+    const rating = Number(state.form.rating);
 
-      const nameOk = name.length > 0;
-      const bonusOk = bonus.length > 0;
-      const ratingOk = Number.isFinite(rating) && rating >= 0 && rating <= 5;
+    const nameOk = name.length > 0;
+    const bonusOk = bonus.length > 0;
+    const ratingOk = Number.isFinite(rating) && rating >= 0 && rating <= 5;
 
-      update((d) => {
-        d.isValid = nameOk && bonusOk && ratingOk;
+    update((d) => {
+      d.isValid = nameOk && bonusOk && ratingOk;
 
-        // легка нормалізація
-        d.form.name = name;
-        d.form.bonus = bonus;
-        d.form.rating = rating;
-        
-        if (typeof d.form.description === "string") {
-          const t = d.form.description.trim();
-          d.form.description = t === "" ? "" : t;
-        }
-        if (typeof d.form.partnerUrl === "string") {
-          const t = d.form.partnerUrl.trim();
-          d.form.partnerUrl = t === "" ? "" : t;
-        }
-      });
+      // легка нормалізація
+      d.form.name = name;
+      d.form.bonus = bonus;
+      d.form.rating = rating;
+
+      if (typeof d.form.description === "string") {
+        const t = d.form.description;
+        d.form.description = t === "" ? "" : t;
+      }
+      if (typeof d.form.partnerUrl === "string") {
+        const t = d.form.partnerUrl;
+        d.form.partnerUrl = t === "" ? "" : t;
+      }
+    });
   };
 
   useEffect(() => {
@@ -145,20 +173,22 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
 
     try {
       // 1) Базовый payload
-      const base: Omit<CreateOfferDTO, "logoUrl"> = {
+      const base: Omit<CreateOfferDTO, "logoUrl" | "isActive"> = {
         name: state.form.name.trim(),
         bonus: state.form.bonus.trim(),
         description: state.form.description.trim() || undefined,
         rating: state.form.rating,
         partnerUrl: state.form.partnerUrl.trim() || undefined,
-        brandAdvantages: state.form.brandAdvantages
+        brandAdvantages: state.form.brandAdvantages,
       };
 
       // 2) Лого: если выбрали новый файл — грузим, иначе берём текущее/начальное
-      let resolvedLogoUrl: string | null | undefined = state.logoUrl ?? initialLogoUrl ?? undefined;
+      let resolvedLogoUrl: string | null | undefined =
+        state.logoUrl ?? initialLogoUrl ?? undefined;
       if (state.logoFile) {
         const uploaded: any = await uploadFile(state.logoFile);
-        const url = uploaded?.url || uploaded?.data?.url || uploaded?.result?.url || null;
+        const url =
+          uploaded?.url || uploaded?.data?.url || uploaded?.result?.url || null;
         resolvedLogoUrl = url ?? undefined;
       }
 
@@ -205,26 +235,27 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
   const loading = isFetching || state.isSubmitting;
 
   return (
-    <Card
-      radius="sm"
-      shadow="none"
-    >
+    <Card radius="sm" shadow="none">
       <CardBody>
-        <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
+        <form
+          className="flex flex-col gap-5"
+          onSubmit={handleSubmit}
+          noValidate
+        >
           <div className="flex  gap-4">
             {/* Фото слева */}
             <div className="shrink-0 flex-1">
               <SingleFileUploader
-                    valueUrl={state.logoFile ? null : state.logoUrl ?? undefined}
-                    onChange={(file) =>
-                      update((d) => {
-                        d.logoFile = file;
-                      })
-                    }
-                    accept={["image/*"]}
-                    maxSizeMb={5}
-                    description=": PNG, JPG, WEBP up to 5 MB"
-                  />
+                valueUrl={state.logoFile ? null : (state.logoUrl ?? undefined)}
+                onChange={(file) =>
+                  update((d) => {
+                    d.logoFile = file;
+                  })
+                }
+                accept={["image/*"]}
+                maxSizeMb={5}
+                description=": PNG, JPG, WEBP up to 5 MB"
+              />
             </div>
 
             {/* Справа — Name + Description в колонке */}
@@ -232,7 +263,8 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
               <Input
                 type="text"
                 label="Name"
-                variant="bordered"
+                labelPlacement="outside"
+                variant="flat"
                 placeholder="Awesome Casino"
                 value={state.form.name}
                 onValueChange={(v) =>
@@ -245,7 +277,8 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
               />
               <Textarea
                 label="Description"
-                variant="bordered"
+                labelPlacement="outside"
+                variant="flat"
                 placeholder="Describe bonus terms and highlights"
                 value={state.form.description}
                 onValueChange={(v) =>
@@ -264,7 +297,8 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
             <Input
               type="text"
               label="Bonus"
-              variant="bordered"
+              labelPlacement="outside"
+              variant="flat"
               placeholder="100% up to $3,000 + 220 Bonus Spins"
               value={state.form.bonus}
               onValueChange={(v) =>
@@ -276,11 +310,12 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
               isDisabled={loading}
               className="col-span-1 md:col-span-2"
             />
-            
+
             <Input
               type="number"
               label="Rating (0-5)"
-              variant="bordered"
+              labelPlacement="outside"
+              variant="flat"
               placeholder="4.5"
               value={state.form.rating.toString()}
               onValueChange={(v) =>
@@ -298,7 +333,8 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
             <Input
               type="url"
               label="Partner URL"
-              variant="bordered"
+              labelPlacement="outside"
+              variant="flat"
               placeholder="https://partner.example.com"
               value={state.form.partnerUrl}
               onValueChange={(v) =>
@@ -312,7 +348,11 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
 
             <ArrayStringEditor
               title="Brand Advantages"
-              values={Array.isArray(state.form.brandAdvantages) ? state.form.brandAdvantages : []}
+              values={
+                Array.isArray(state.form.brandAdvantages)
+                  ? state.form.brandAdvantages
+                  : []
+              }
               onChange={(vals) =>
                 update((d) => {
                   d.form.brandAdvantages = vals;
@@ -335,7 +375,12 @@ const DetailsOfferForm: React.FC<Props> = ({ offerId, initialLogoUrl = null, onC
               {cta}
             </Button>
             {onClose && (
-              <Button variant="flat" onPress={onClose} isDisabled={loading} type="button">
+              <Button
+                variant="flat"
+                onPress={onClose}
+                isDisabled={loading}
+                type="button"
+              >
                 Close
               </Button>
             )}

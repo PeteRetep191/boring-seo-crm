@@ -1,16 +1,38 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { useImmer } from "use-immer";
 // components
-import { DndContext, useSensor, useSensors, PointerSensor, closestCenter, DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  closestCenter,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { restrictToVerticalAxis, restrictToParentElement } from "@dnd-kit/modifiers";
-import { Card, CardHeader, CardBody, CardFooter, Button, Checkbox, Tooltip } from "@heroui/react";
+import {
+  restrictToVerticalAxis,
+  restrictToParentElement,
+} from "@dnd-kit/modifiers";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Button,
+  Checkbox,
+  Tooltip,
+} from "@heroui/react";
 // Icons
 import { GripVerticalIcon, Trash2, Inbox } from "lucide-react";
 // libs
 import { pickFirstChildOfType } from "@/shared/lib/react";
-
 
 // ==========================
 // DraggableList
@@ -41,10 +63,10 @@ export function DraggableList<T extends WithId>({
   }, [state, onChange]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
-  const ids = useMemo(() => state.map(i => i.id), [state]);
+  const ids = useMemo(() => state.map((i) => i.id), [state]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -54,12 +76,12 @@ export function DraggableList<T extends WithId>({
     const newIndex = ids.indexOf(String(over.id));
     if (oldIndex < 0 || newIndex < 0) return;
 
-    update(draft => arrayMove(draft, oldIndex, newIndex));
+    update((draft) => arrayMove(draft, oldIndex, newIndex));
   };
 
   const handleRemove = (id: string) => {
-    update(draft => {
-      const idx = draft.findIndex(i => i.id === id);
+    update((draft) => {
+      const idx = draft.findIndex((i) => i.id === id);
       if (idx >= 0) draft.splice(idx, 1);
     });
   };
@@ -78,20 +100,23 @@ export function DraggableList<T extends WithId>({
         modifiers={[restrictToVerticalAxis, restrictToParentElement]}
       >
         <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
+          <div className="space-y-2 px-1">
             {Array.isArray(state) && state.length > 0 ? (
-               state.map((item, index) => (
-                  <SortableRow key={item.id} id={item.id} onRemove={() => handleRemove(item.id)}>
-                    {renderItem(item, index)}
-                  </SortableRow>
-                ))
-            ):(
-              <div className="flex items-center justify-center flex-col gap-2">
-                <Inbox size={40}/>
-                <span>No items yet...</span>
+              state.map((item, index) => (
+                <SortableRow
+                  key={item.id}
+                  id={item.id}
+                  onRemove={() => handleRemove(item.id)}
+                >
+                  {renderItem(item, index)}
+                </SortableRow>
+              ))
+            ) : (
+              <div className="flex items-center justify-center gap-2 p-5">
+                <Inbox size={18} className="text-default-400" />
+                <span className="text-default-400">No items yet...</span>
               </div>
             )}
-           
           </div>
         </SortableContext>
       </DndContext>
@@ -111,8 +136,14 @@ type SortableRowProps = {
 };
 
 function SortableRow({ id, onRemove, children }: SortableRowProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -122,51 +153,38 @@ function SortableRow({ id, onRemove, children }: SortableRowProps) {
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card
-        shadow="none"
-        radius="sm"
-      >
-        <CardBody 
-          className="relative flex flex-row items-stretch gap-2 p-0"
-        >
-            <div className="flex flex-col items-center h-auto bg-primary/35">
-               <Checkbox
-                  className="m-0 p-0 pt-2"
-                  classNames={{ 
-                    wrapper: "p-0 m-0",
-                   }}
-                />
-              <Button
-                size="sm"
-                radius="none"
-                isIconOnly
-                variant="flat"
-                color="primary"
-                title="Drag"
-                {...attributes}
-                {...listeners}
-                className="flex-1 bg-transparent"
-              >
-                <GripVerticalIcon size={20}/>
-              </Button>
-            </div>
+      <Card shadow="none" radius="sm">
+        <CardBody className="relative flex flex-row items-stretch gap-2 p-0">
+          <div className="flex flex-col items-center justify-center h-auto">
+            <Button
+              size="sm"
+              radius="sm"
+              isIconOnly
+              variant="light"
+              color="default"
+              title="Drag"
+              {...attributes}
+              {...listeners}
+              className="min-w-[5px] w-[25px]"
+            >
+              <GripVerticalIcon size={20} />
+            </Button>
+          </div>
 
-            <div className="flex flex-1 flex-row min-w-0 py-2">
-              {children}
-            </div>
-            <Tooltip content="Remove Item" placement="top">
-              <Button
-                size="sm"
-                isIconOnly
-                variant="flat"
-                color="danger"
-                title="Remove"
-                radius="none"
-                className="h-auto"
-              >
-                <Trash2 size={20}/>
-              </Button>
-            </Tooltip>
+          <div className="flex flex-1 flex-row min-w-0 py-2">{children}</div>
+          <div className="flex flex-col items-center justify-center h-auto">
+            <Button
+              size="sm"
+              radius="sm"
+              isIconOnly
+              variant="light"
+              color="danger"
+              title="Remove"
+              className="min-w-[5px] w-[30px]"
+            >
+              <Trash2 size={18} />
+            </Button>
+          </div>
         </CardBody>
       </Card>
     </div>
@@ -176,8 +194,12 @@ function SortableRow({ id, onRemove, children }: SortableRowProps) {
 // ==========================
 // Markers
 // ==========================
-export const DraggableListHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>;
-export const DraggableListFooter: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>;
+export const DraggableListHeader: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => <>{children}</>;
+export const DraggableListFooter: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => <>{children}</>;
 
 // ==========================
 // Types

@@ -7,7 +7,10 @@ import {
 } from "@/api/backend/contracts/offer.dto";
 
 // Create Axios Instance
-const apiClient = createAxiosInstance({ baseURL: '/api/offers' , options: { withSession: true } });
+const apiClient = createAxiosInstance({
+  baseURL: "/api/offers",
+  options: { withSession: true },
+});
 
 // ===============================
 // Helpers
@@ -37,8 +40,18 @@ export const createOffer = async (data: CreateOfferDTO): Promise<any> => {
   return apiClient.post("/", data);
 };
 
-export const updateOffer = async (data: { offerId: string; updatedOfferData: UpdateOfferDTO }): Promise<any> => {
+export const updateOffer = async (data: {
+  offerId: string;
+  updatedOfferData: UpdateOfferDTO;
+}): Promise<any> => {
   return apiClient.put(`/${data.offerId}`, data.updatedOfferData);
+};
+
+export const patchOffer = async (data: {
+  offerId: string;
+  updatedOfferData: UpdateOfferDTO;
+}): Promise<any> => {
+  return apiClient.patch(`/${data.offerId}`, data.updatedOfferData);
 };
 
 export const deleteOfferById = async (offerId: string): Promise<void> => {

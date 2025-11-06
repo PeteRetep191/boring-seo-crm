@@ -1,9 +1,9 @@
 // UI
 import { ConfirmPopover } from "@/shared/ui";
 // Components
-import { Button, Chip, Tooltip } from "@heroui/react";
+import { Button, Chip, Tooltip, Switch } from "@heroui/react";
 // Icons
-import { Edit, Trash2, Archive, ArchiveRestore, ExternalLink } from "lucide-react";
+import { Edit, Trash2, ExternalLink } from "lucide-react";
 // Libs
 import { formatDateTime } from "@/shared/lib/date";
 
@@ -11,26 +11,39 @@ const PLACEHOLDER_LOGO = "/images/placeholder-logo.webp";
 
 export const offerColumnDefs = [
   {
-    colId: "checkbox",
-    headerName: "",
-    checkboxSelection: true,
-    headerCheckboxSelection: true,
-    headerCheckboxSelectionFilteredOnly: true,
-    pinned: "left",
-    cellStyle: { display: "flex", alignItems: "center" },
-    width: 56,
-    maxWidth: 56,
+    headerName: "Enabled",
+    field: "isActive",
+    minWidth: 90,
+    width: 90,
+    maxWidth: 90,
+    sortable: false,
     lockPosition: true,
     suppressMovable: true,
-    resizable: false,
-    sortable: false,
-    filter: false,
+    cellStyle: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    cellRenderer: (params: any) => {
+      const isActive = !!params.data?.isActive;
+      return (
+        <Switch
+          size="sm"
+          isSelected={isActive}
+          onChange={(e) => {
+            params.context.onChangeEnable(params.data.id, e.target.checked);
+          }}
+        />
+      );
+    },
   },
   {
     headerName: "Offer",
     field: "name",
     minWidth: 300,
-    tooltipField: "name",
+    sortable: false,
+    lockPosition: true,
+    suppressMovable: true,
     cellRenderer: (params: any) => {
       const { name, logoUrl, rating } = params.data || {};
       const src = logoUrl ?? PLACEHOLDER_LOGO;
@@ -48,7 +61,8 @@ export const offerColumnDefs = [
             className="h-12 w-12 rounded object-cover bg-black/10"
             onError={(e) => {
               const img = e.currentTarget as HTMLImageElement;
-              if (img.src !== location.origin + PLACEHOLDER_LOGO) img.src = PLACEHOLDER_LOGO;
+              if (img.src !== location.origin + PLACEHOLDER_LOGO)
+                img.src = PLACEHOLDER_LOGO;
             }}
           />
           <div className="flex flex-col gap-1 min-w-0">
@@ -56,7 +70,10 @@ export const offerColumnDefs = [
               {name}
             </span>
 
-            <div className="flex items-center gap-2" aria-label={`Rating ${r.toFixed(1)} of 5`}>
+            <div
+              className="flex items-center gap-2"
+              aria-label={`Rating ${r.toFixed(1)} of 5`}
+            >
               <span className="text-base leading-none">
                 <span className="text-yellow-500 text-xs">{filled}</span>
                 <span className="text-gray-400">{empty}</span>
@@ -75,9 +92,14 @@ export const offerColumnDefs = [
     headerName: "Bonus",
     field: "bonus",
     minWidth: 200,
+    sortable: false,
+    lockPosition: true,
+    suppressMovable: true,
     cellStyle: { display: "flex", alignItems: "center" },
     tooltipValueGetter: (p: any) => {
-      const hasDesc = typeof p?.data?.description === "string" && p.data.description.trim().length > 0;
+      const hasDesc =
+        typeof p?.data?.description === "string" &&
+        p.data.description.trim().length > 0;
       return p?.data
         ? hasDesc
           ? `${p.data.bonus} — ${p.data.description}`
@@ -99,11 +121,16 @@ export const offerColumnDefs = [
     headerName: "Partner",
     field: "partnerUrl",
     minWidth: 140,
+    sortable: false,
+    lockPosition: true,
+    suppressMovable: true,
     cellStyle: { display: "flex", alignItems: "center" },
-    tooltipField: "partnerUrl",
     cellRenderer: (params: any) => {
       const url = params.data?.partnerUrl;
-      if (!url) return <span className="text-sm text-gray-500 dark:text-gray-400">—</span>;
+      if (!url)
+        return (
+          <span className="text-sm text-gray-500 dark:text-gray-400">—</span>
+        );
       return (
         <Tooltip content="Open partner link" placement="top">
           <Button
@@ -124,7 +151,9 @@ export const offerColumnDefs = [
     headerName: "Status",
     field: "archived",
     minWidth: 120,
-    tooltipField: "archived",
+    sortable: false,
+    lockPosition: true,
+    suppressMovable: true,
     cellStyle: { display: "flex", alignItems: "center" },
     cellRenderer: (params: any) => {
       const archived = !!params.data?.archived;
@@ -139,11 +168,15 @@ export const offerColumnDefs = [
     headerName: "Created At",
     field: "createdAt",
     minWidth: 200,
+    sortable: false,
+    lockPosition: true,
+    suppressMovable: true,
     cellStyle: { display: "flex", alignItems: "center" },
-    tooltipField: "createdAt",
     cellRenderer: (params: any) => (
       <span className="text-sm">
-        {params.data?.createdAt ? formatDateTime(params.data.createdAt, { full: true }) : "—"}
+        {params.data?.createdAt
+          ? formatDateTime(params.data.createdAt, { full: true })
+          : "—"}
       </span>
     ),
   },
@@ -151,11 +184,14 @@ export const offerColumnDefs = [
     headerName: "Updated At",
     field: "updatedAt",
     minWidth: 200,
-    tooltipField: "updatedAt",
+    lockPosition: true,
+    suppressMovable: true,
     cellStyle: { display: "flex", alignItems: "center" },
     cellRenderer: (params: any) => (
       <span className="text-sm">
-        {params.data?.updatedAt ? formatDateTime(params.data.updatedAt, { full: true }) : "—"}
+        {params.data?.updatedAt
+          ? formatDateTime(params.data.updatedAt, { full: true })
+          : "—"}
       </span>
     ),
   },
@@ -164,9 +200,9 @@ export const offerColumnDefs = [
     headerName: "Actions",
     pinned: "right",
     cellStyle: { display: "flex", alignItems: "center" },
-    width: 168,
-    minWidth: 168,
-    maxWidth: 180,
+    width: 105,
+    minWidth: 105,
+    maxWidth: 105,
     lockPosition: true,
     suppressMovable: true,
     resizable: false,
@@ -174,8 +210,6 @@ export const offerColumnDefs = [
     sortable: false,
     cellRenderer: (params: any) => {
       const id = params.data?._id;
-      const archived = !!params.data?.archived;
-
       return (
         <div className="flex items-center gap-2">
           <Button
@@ -188,30 +222,6 @@ export const offerColumnDefs = [
           >
             <Edit size={18} />
           </Button>
-
-          <ConfirmPopover
-            title={archived ? "Unarchive Offer" : "Archive Offer"}
-            description={
-              archived
-                ? "Return this offer to Active?"
-                : "Move this offer to Archive? You can restore it later."
-            }
-            approveLabel={archived ? "Unarchive" : "Archive"}
-            cancelLabel="Cancel"
-            approveColor={archived ? "success" : "default"}
-            onApprove={() => params.context.onToggleArchive?.(id, !archived)}
-          >
-            <Button
-              isIconOnly
-              size="sm"
-              variant="flat"
-              color={archived ? "success" : "default"}
-              aria-label={archived ? "Unarchive offer" : "Archive offer"}
-            >
-              {archived ? <ArchiveRestore size={18} /> : <Archive size={18} />}
-            </Button>
-          </ConfirmPopover>
-
           <Tooltip content="Delete Offer">
             <ConfirmPopover
               title="Delete Offer"
@@ -223,7 +233,13 @@ export const offerColumnDefs = [
               approveColor="danger"
               onApprove={() => params.context.onDeleteRow?.(id)}
             >
-              <Button isIconOnly size="sm" variant="flat" color="danger" aria-label="Delete offer">
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                color="danger"
+                aria-label="Delete offer"
+              >
                 <Trash2 size={18} />
               </Button>
             </ConfirmPopover>

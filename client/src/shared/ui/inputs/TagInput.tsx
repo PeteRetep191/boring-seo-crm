@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Chip, Input} from "@heroui/react";
+import { Chip, Input } from "@heroui/react";
 
 const defaultSeparators = ["Enter", "Tab", ","];
 
@@ -65,7 +65,9 @@ export function TagsInput({
   }, [value]);
 
   const placeholderText =
-    maxTagsCount !== undefined && tags.length >= maxTagsCount ? "" : placeHolder;
+    maxTagsCount !== undefined && tags.length >= maxTagsCount
+      ? ""
+      : placeHolder;
 
   const tryAdd = (raw: string) => {
     const text = raw.trim();
@@ -75,25 +77,34 @@ export function TagsInput({
       onExisting?.(text);
       return;
     }
-    setTags(prev => [...prev, text]);
+    setTags((prev) => [...prev, text]);
   };
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (disabled) return;
 
     // backspace-remove
-    if (!inputValue && !disableBackspaceRemove && tags.length && e.key === "Backspace") {
+    if (
+      !inputValue &&
+      !disableBackspaceRemove &&
+      tags.length &&
+      e.key === "Backspace"
+    ) {
       e.preventDefault();
-      const last = tags[tags.length - 1];           // ← без .at()
-      setTags(prev => prev.slice(0, -1));
+      const last = tags[tags.length - 1];
+      setTags((prev) => prev.slice(0, -1));
       if (isEditOnRemove) {
-        setInputValue(`${last} `);                  // вернуть текст сразу в инпут
+        setInputValue(`${last} `);
       }
       return;
     }
 
     // достигли лимита — блокируем набор, кроме backspace
-    if (maxTagsCount !== undefined && tags.length >= maxTagsCount && e.key !== "Backspace") {
+    if (
+      maxTagsCount !== undefined &&
+      tags.length >= maxTagsCount &&
+      e.key !== "Backspace"
+    ) {
       e.preventDefault();
       return;
     }
@@ -107,56 +118,63 @@ export function TagsInput({
   };
 
   const removeTag = (t: string) => {
-    setTags(prev => prev.filter(x => x !== t));
+    setTags((prev) => prev.filter((x) => x !== t));
     onRemoved?.(t);
   };
 
   return (
-    <div
-      className={[
-        "flex flex-wrap items-center gap-2 rounded-lg bg-default-100 p-2",
-        classNames?.root ?? ""
-      ].join(" ")}
-      onClick={(e) => {
-        const target = e.currentTarget.querySelector("input") as HTMLInputElement | null;
-        target?.focus();
-      }}
-    >
-      {tags.map((t) => (
-        <Chip
-          key={t}
-          size="sm"
-          variant="flat"
-          color="primary"
-          radius="sm"
-          className={classNames?.chip}
-          onClose={() => !disabled && removeTag(t)}
-        >
-          {t}
-        </Chip>
-      ))}
-
-      <Input
-        name={name}
-        aria-label={name ?? "tags-input"}
-        placeholder={placeholderText}
-        size="sm"
-        variant="bordered"
-        radius="sm"
-        isDisabled={!!disabled}
-        onBlur={onBlur}
-        onKeyUp={onKeyUp}
-        onKeyDown={handleKeyDown}
-        value={inputValue}
-        onValueChange={setInputValue}
-        classNames={{
-          base: "min-w-[140px] w-auto flex-1 !bg-transparent",
-          inputWrapper:
-            "!bg-transparent shadow-none h-8 min-h-8 px-0 py-0 !border-0 " +
-            "data-[hover=true]:!bg-transparent data-[focus=true]:!bg-transparent",
-          input: "!text-small !leading-none placeholder:text-foreground-500 " + (classNames?.input ?? ""),
+    <div className="flex flex-col gap-1.5">
+      <span className="text-sm">Tags</span>
+      <div
+        className={[
+          "flex flex-wrap items-center gap-2 rounded-lg bg-default-100 p-2",
+          classNames?.root ?? "",
+        ].join(" ")}
+        onClick={(e) => {
+          const target = e.currentTarget.querySelector(
+            "input",
+          ) as HTMLInputElement | null;
+          target?.focus();
         }}
-      />
+      >
+        {tags.map((t) => (
+          <Chip
+            key={t}
+            size="sm"
+            variant="flat"
+            color="primary"
+            radius="sm"
+            className={classNames?.chip}
+            onClose={() => !disabled && removeTag(t)}
+          >
+            {t}
+          </Chip>
+        ))}
+
+        <Input
+          name={name}
+          aria-label={name ?? "tags-input"}
+          placeholder={placeholderText}
+          size="sm"
+          variant="bordered"
+          radius="sm"
+          isDisabled={!!disabled}
+          onBlur={onBlur}
+          onKeyUp={onKeyUp}
+          onKeyDown={handleKeyDown}
+          value={inputValue}
+          onValueChange={setInputValue}
+          classNames={{
+            base: "min-w-[140px] w-auto flex-1 !bg-transparent",
+            inputWrapper:
+              "!bg-transparent shadow-none h-8 min-h-8 px-0 py-0 !border-0 " +
+              "data-[hover=true]:!bg-transparent data-[focus=true]:!bg-transparent",
+            input:
+              "!text-small !leading-none placeholder:text-foreground-500 " +
+              (classNames?.input ?? ""),
+          }}
+        />
+      </div>
     </div>
   );
 }

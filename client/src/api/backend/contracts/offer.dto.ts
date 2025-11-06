@@ -9,9 +9,10 @@ export interface Offer {
   rating: number; // 0..5
   partnerUrl?: string | null;
   brandAdvantages: string[];
+  isActive: boolean;
   archived: boolean;
-  createdAt: string; // ISO
-  updatedAt: string; // ISO
+  createdAt: string;
+  updatedAt: string;
 }
 
 /** DTO для создания оффера */
@@ -22,6 +23,7 @@ export interface CreateOfferDTO {
   description?: string | null;
   rating: number;
   partnerUrl?: string | null;
+  isActive?: boolean;
   brandAdvantages?: string[];
   archived?: boolean;
 }

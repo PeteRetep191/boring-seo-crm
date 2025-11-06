@@ -1,13 +1,13 @@
 import React from "react";
 import { Button } from "@heroui/react";
-import { ChevronLeft, Home } from "lucide-react";
+import { Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col gap-4 py-6">
+    <div className="absolute t-0 l-0 flex flex-col h-full w-full items-center justify-center gap-4 py-6">
       <div className="flex flex-col items-center gap-3 text-center">
         <div className="text-6xl font-bold">404</div>
         <div className="text-xl">Page not found</div>

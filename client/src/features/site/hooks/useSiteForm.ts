@@ -1,142 +1,128 @@
 import { useEffect } from "react";
 import { useImmer } from "use-immer";
-// repository
-import { sessionIdRepo } from "@/entities/session-id";
+// Types
+import { ISite, ISiteDetailsFormState, SiteFormProps } from "../types";
+import { IPlacement } from "@/features/placement/types";
 // utils
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 // ========================
 // Constants
 // ========================
-const INITIAL_FORM_STATE: SiteFormState = {
-    isSubmitting: false,
-    isValid: true,
-    formData: {
-        name: "",
-        description: "",
-        url: "",
-        tags: [],
-        apiDocumentation: "",
-        defaultOffersIds: [],
-        assignedOffersIds: [],
-        showcases: [],
-    }
+const INITIAL_FORM: ISite = {
+  name: "",
+  description: "",
+  url: "",
+  tags: [],
+  placements: [],
+  webhookUrl: "",
+  showcases: [],
+};
+
+const STATE: ISiteDetailsFormState = {
+  isSubmitting: false,
+  isValid: true,
 };
 
 // ========================
 // Hook
 // ========================
-const useSiteForm = (): SiteFormApi => {
-    const [state, update] = useImmer<SiteFormState>(INITIAL_FORM_STATE);
+const useSiteForm = ({ siteId, onClose }: SiteFormProps): SiteFormApi => {
+  const [form, updateForm] = useImmer<ISite>(INITIAL_FORM);
+  const [state, updateState] = useImmer<ISiteDetailsFormState>(STATE);
 
-    // --------------------------
-    // Actions
-    // --------------------------
-    const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+  // --------------------------
+  // Actions
+  // --------------------------
+  const handleSubmit = async (args?: {
+    onSuccess?: () => void;
+    onError?: () => void;
+  }) => {
+    updateState((draft) => {
+      draft.isSubmitting = true;
+    });
 
-        e?.preventDefault();
+    try {
+      await new Promise<void>((resolve) => setTimeout(resolve, 500));
 
-        update(draft => {
-            draft.isSubmitting = true;
-        });
-        try {
-            await new Promise<void>(resolve => setTimeout(resolve, 2000));
-            
-            const fakeResponse = {
-                
-            };
+      console.log("Form values:", form);
 
-            // sessionIdRepo.saveSessionId(fakeResponse.sessionId);
-            toast.success("Login successful!");
-        } catch (error) {
-            toast.error("Login failed. Please try again.");
-        } finally {
-            update(draft => {
-                draft.isSubmitting = false;
-            });
-        }
-    };
+      if (siteId) {
+        // TODO add logic here
+        toast.success("Site was changed successfully.");
+      } else {
+        // TODO add logic here
+        toast.success("Site was created successfully.");
+      }
 
-    const validate = () => {
-        const { name = "", url = "" } = state.formData;
+      // args && args.onSuccess && args.onSuccess();
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
 
-        const isValid = name.trim().length > 0 && url.trim().length > 0
-
-        update(draft => {
-            draft.isValid = isValid;
-        });
-    };
-
-    const resetForm = () => {
-        update(draft => {
-            draft.formData.name = "";
-            draft.formData.url = "";
-            draft.formData.tags = [];
-        });
-    };
-
-    // --------------------------
-    // Effects
-    // --------------------------
-    useEffect(() => {
-        validate();
-    }, [state.formData]);
-
-    // --------------------------
-    // Return
-    // --------------------------
-    return {
-        state,
-        actions: {
-            handleSubmit,
-            update,
-            validate,
-            resetForm,
-        }
+      args && args.onError && args.onError();
+    } finally {
+      resetForm();
+      updateState((draft) => {
+        draft.isSubmitting = false;
+      });
     }
-}
+  };
+
+  const validate = () => {
+    const { name = "", url = "" } = form;
+
+    const isValid = name.trim().length > 0 && url.trim().length > 0;
+
+    updateState((draft) => {
+      draft.isValid = isValid;
+    });
+  };
+
+  const resetForm = () => {
+    updateState(() => INITIAL_FORM);
+  };
+
+  // --------------------------
+  // Effects
+  // --------------------------
+  useEffect(() => {
+    validate();
+    console.log("Form values:", form);
+  }, [form]);
+
+  // --------------------------
+  // Return
+  // --------------------------
+  return {
+    state,
+    form,
+    actions: {
+      handleSubmit,
+      updateForm,
+      validate,
+      resetForm,
+    },
+  };
+};
 
 export default useSiteForm;
 
 // ========================
 // Types
 // ========================
-export type SiteFormState = {
-    isSubmitting: boolean;
-    isValid: boolean;
-    formData: {
-        name: string;
-        description?: string;
-        url: string;
-        tags: string[];
-        apiDocumentation: string;
-        defaultOffersIds?: string[];
-        assignedOffersIds?: string[];
-        showcases: IShowcase[];
-    }
-}
-
-export type IShowcase = {
-    filter: IShowcaseFilter;
-    offerIds: string[];
-}
-
-export type IDeviceType = "desktop" | "mobile" | "tablet";
-
-export type IShowcaseFilter = {
-    countriesCodes?: string[];
-    ipAddresses?: string[];
-    devicesTypes?: IDeviceType[];
-    refferers?: string[];
-}
-
 export type SiteFormApi = {
-    state: SiteFormState;
-    actions: {
-        handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>;
-        update: (updater: (draft: SiteFormState) => void) => void;
-        validate: () => void;
-        resetForm: () => void;
-    }
-
-}
+  state: ISiteDetailsFormState;
+  form: ISite;
+  actions: {
+    handleSubmit: ({
+      onSuccess,
+      onError,
+    }: {
+      onSuccess?: () => void;
+      onError?: () => void;
+    }) => Promise<void>;
+    updateForm: (updater: (draft: ISite) => void) => void;
+    validate: () => void;
+    resetForm: () => void;
+  };
+};

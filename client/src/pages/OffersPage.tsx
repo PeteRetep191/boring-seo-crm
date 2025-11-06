@@ -4,10 +4,36 @@ import { useImmer } from "use-immer";
 // Context
 import { useAuthContext } from "@/core/providers/AuthProvider";
 // API
-import { fetchOffers, updateOffer, deleteOfferById } from "@/api/backend/routes/offer.api"; 
-import { Button, Input, Divider, Pagination, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/react"; 
-import { DynamicTable, DynamicTableBody, DynamicTableFooter, DynamicTableHeader } from "@/features/components/dynamic-table/ui"; 
-import { ScalablePanel, ScalablePanelHeader, ScalablePanelFooter, ScalablePanelBody } from "@/shared/ui";
+import {
+  fetchOffers,
+  updateOffer,
+  patchOffer,
+  deleteOfferById,
+} from "@/api/backend/routes/offer.api";
+import {
+  Button,
+  Input,
+  Divider,
+  Pagination,
+  Select,
+  SelectItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+} from "@heroui/react";
+import {
+  DynamicTable,
+  DynamicTableBody,
+  DynamicTableFooter,
+  DynamicTableHeader,
+} from "@/features/components/dynamic-table/ui";
+import {
+  ScalablePanel,
+  ScalablePanelHeader,
+  ScalablePanelFooter,
+  ScalablePanelBody,
+} from "@/features/components/scalable-panel/ui";
 // Icons
 import { Search, RefreshCcw, Plus } from "lucide-react";
 // Table
@@ -19,13 +45,15 @@ import toast from "react-hot-toast";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 // DTOs
 import { FetchOffersDTO } from "@/api/backend/contracts/offer.dto";
+// Libs
+import { formatPaginationStatus } from "@/shared/lib/pagination";
 
 const INITIAL_STATE = {
   search: "",
   pagination: {
     page: 1,
     pages: 1,
-    total: 0,
+    totalRows: 0,
     limit: {
       default: 50,
       current: 50,
@@ -61,11 +89,25 @@ const OffersPage: React.FC = () => {
       search: state.search,
       filters: state.filters,
     }),
-    [state.pagination.page, state.pagination.limit.current, state.search, state.filters]
+    [
+      state.pagination.page,
+      state.pagination.limit.current,
+      state.search,
+      state.filters,
+    ],
   );
 
-  const { data: offers, isFetching, refetch } = useQuery({
-    queryKey: ["offers", queryParams.page, queryParams.limit, queryParams.search],
+  const {
+    data: offers,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "offers",
+      queryParams.page,
+      queryParams.limit,
+      queryParams.search,
+    ],
     queryFn: async () => {
       const res = await fetchOffers(queryParams);
       if (!res?.data?.result) throw new Error("No data");
@@ -76,7 +118,7 @@ const OffersPage: React.FC = () => {
         d.pagination.page = pagination?.page ?? 1;
         d.pagination.limit.current =
           pagination?.limit ?? INITIAL_STATE.pagination.limit.default;
-        d.pagination.total = pagination?.total ?? 0;
+        // d.pagination.total = pagination?.total ?? 0;
       });
 
       return res.data.result;
@@ -104,8 +146,25 @@ const OffersPage: React.FC = () => {
   }, [state.filters, update]);
 
   // -------------------------
-  // Table context actions
+  // Actions
   // -------------------------
+  const handleChangeEnabled = async (
+    offerId: string,
+    newActiveStatus: boolean,
+  ) => {
+    try {
+      await patchOffer({
+        offerId,
+        updatedOfferData: { isActive: newActiveStatus } as any,
+      });
+      toast.success(newActiveStatus ? "Offer activated" : "Offer deactivated");
+      refetch();
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to update status");
+    }
+  };
+
   const handleEditRow = (offerId: string) => {
     const row = (offers as any[] | undefined)?.find((o) => o._id === offerId);
     update((d) => {
@@ -197,6 +256,7 @@ const OffersPage: React.FC = () => {
               }
               context={{
                 user,
+                onChangeEnable: handleChangeEnabled,
                 onEditRow: handleEditRow,
                 onDeleteRow: handleDeleteRow,
                 onToggleArchive: handleToggleArchive,
@@ -234,7 +294,14 @@ const OffersPage: React.FC = () => {
 
         <DynamicTableFooter className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground mr-4">
-            {state.pagination.total} offers
+            {formatPaginationStatus(
+              state.pagination.page,
+              state.pagination.limit.current,
+              state.pagination.totalRows,
+              {
+                locale: "en",
+              },
+            )}
           </span>
           <div className="flex items-center gap-4">
             <Select
@@ -322,7 +389,9 @@ const OffersPage: React.FC = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Edit offer</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">
+                Edit offer
+              </ModalHeader>
               <ModalBody className="p-0">
                 {state.editing.offerId && (
                   <DetailsOfferForm

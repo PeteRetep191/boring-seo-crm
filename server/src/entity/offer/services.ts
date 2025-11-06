@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import OfferModel, { IOfferDocument } from "@/models/offer.model";
-import * as OfferDTOs from "./dtos";
+import * as OfferDTOs from "@/api/offer/offer.dto";
 import { buildFiltersMatch } from "@/shared/utils/mongo";
 
 type OfferUpsert = Partial<

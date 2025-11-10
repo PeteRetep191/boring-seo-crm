@@ -17,22 +17,6 @@ const PLACEHOLDER_LOGO = "/images/placeholder-logo.webp";
 
 export const offerColumnDefs = [
   {
-    colId: "checkbox",
-    headerName: "",
-    checkboxSelection: true,
-    headerCheckboxSelection: true,
-    headerCheckboxSelectionFilteredOnly: true,
-    pinned: "left",
-    cellStyle: { display: "flex", alignItems: "center" },
-    width: 56,
-    maxWidth: 56,
-    lockPosition: true,
-    suppressMovable: true,
-    resizable: false,
-    sortable: false,
-    filter: false,
-  },
-  {
     headerName: "Offer",
     field: "name",
     minWidth: 300,

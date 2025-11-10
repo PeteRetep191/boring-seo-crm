@@ -35,11 +35,7 @@ import { useDebounce } from "@/shared/hooks/useDebounce";
 // Libs
 import { formatPaginationStatus } from "@/shared/lib/pagination";
 
-const MOCK_SITES: any[] = [
-  { id: 1, name: "example.com", status: "Active" },
-  { id: 2, name: "testsite.com", status: "Inactive" },
-  { id: 3, name: "mysite.org", status: "Active" },
-];
+const MOCK_SITES: any[] = [];
 
 const INITIAL_STATE = {
   search: "",
@@ -109,17 +105,6 @@ const SitesPage: React.FC = () => {
     }
   };
 
-  const handleToggleArchive = async (offerId: string, archived: boolean) => {
-    try {
-      // await updateOffer({ offerId, updatedOfferData: { archived } as any });
-      toast.success(archived ? "Offer archived" : "Offer unarchived");
-      // refetch();
-    } catch (e) {
-      console.error(e);
-      toast.error("Failed to update status");
-    }
-  };
-
   // ----------------------------
   // Effects
   // ----------------------------
@@ -134,7 +119,7 @@ const SitesPage: React.FC = () => {
           <div className="flex flex-1 items-center justify-start gap-2">
             <Input
               type="search"
-              placeholder="Search websites..."
+              placeholder="Search websites by name, domain, description or tags..."
               className="w-full"
               variant="flat"
               startContent={<Search size={16} className="text-gray-500" />}
@@ -184,7 +169,7 @@ const SitesPage: React.FC = () => {
                 user: authContext.user,
                 onEditRow: handleEditRow,
                 onDeleteRow: handleDeleteRow,
-                onToggleArchive: handleToggleArchive,
+                // onToggleArchive: handleToggleArchive,
               }}
             />
           </div>

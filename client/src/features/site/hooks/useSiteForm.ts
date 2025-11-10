@@ -3,6 +3,7 @@ import { useImmer } from "use-immer";
 // Types
 import { ISite, ISiteDetailsFormState, SiteFormProps } from "../types";
 import { IPlacement } from "@/features/placement/types";
+import { IShowcase } from "@/features/showcase/types";
 // utils
 import toast from "react-hot-toast";
 
@@ -16,7 +17,16 @@ const INITIAL_FORM: ISite = {
   tags: [],
   placements: [],
   webhookUrl: "",
+  defaultShowcase: {
+    filter: null,
+    placements: [],
+  },
   showcases: [],
+  settings: {
+    pushWebhookOnCreateUpdate: true,
+    waitForWebhookSuccessResponse: true,
+    addPlacementsStructureToWebhook: false,
+  },
 };
 
 const STATE: ISiteDetailsFormState = {
@@ -83,12 +93,54 @@ const useSiteForm = ({ siteId, onClose }: SiteFormProps): SiteFormApi => {
   };
 
   // --------------------------
+  // Helpers
+  // --------------------------
+  const ensureShowcasePlacements = (
+    showcase: IShowcase,
+    placements: IPlacement[],
+  ): IShowcase => {
+    const byId = new Map(showcase.placements.map((p) => [p.id, p]));
+
+    const synced = placements.map((placement) => {
+      const existing = byId.get(placement.id);
+      if (!existing) {
+        return { id: placement.id, value: null as string | string[] | null };
+      }
+      return existing;
+    });
+
+    return { ...showcase, placements: synced };
+  };
+
+  // --------------------------
   // Effects
   // --------------------------
   useEffect(() => {
     validate();
     console.log("Form values:", form);
   }, [form]);
+
+  useEffect(() => {
+    const placements = (form.placements ?? []).map((p) => ({
+      id: p.id,
+      type: p.type,
+    }));
+    // const nextTypes: Record<string, PlacementType> = {};
+    // for (const p of placements) {
+    //   nextTypes[p.id] = p.type;
+    // }
+
+    updateForm((draft) => {
+      draft.defaultShowcase = ensureShowcasePlacements(
+        draft.defaultShowcase,
+        form.placements,
+      );
+
+      draft.showcases = (draft.showcases ?? []).map((showcase) =>
+        ensureShowcasePlacements(showcase, form.placements),
+      );
+    });
+  }, [form.placements, updateForm]);
 
   // --------------------------
   // Return

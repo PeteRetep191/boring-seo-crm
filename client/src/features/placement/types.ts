@@ -1,6 +1,7 @@
 export interface IPlacement {
   id: string;
   name: string;
-  description: string;
-  type: "single" | "multiple" | null;
+  type: PlacementType;
 }
+
+export type PlacementType = "single" | "multiple" | null;

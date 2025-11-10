@@ -17,7 +17,6 @@ const PlacementItem: React.FC<{
     id: placement.id,
     type: placement.type || null,
     name: placement.name || "",
-    description: placement.description || "",
   });
 
   useEffect(() => {
@@ -41,7 +40,7 @@ const PlacementItem: React.FC<{
         </Button>
       </CardHeader>
       <CardBody className="p-1 px-2 flex flex-col gap-2">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-5 gap-2">
           <Select
             aria-label="Type"
             placeholder="Select type..."
@@ -64,18 +63,9 @@ const PlacementItem: React.FC<{
                 draft.name = e.target.value;
               });
             }}
+            className="col-span-4"
           />
         </div>
-
-        <Textarea
-          placeholder="(optional) Enter description..."
-          value={placement.description}
-          onChange={(e) => {
-            updateState((draft) => {
-              draft.description = e.target.value;
-            });
-          }}
-        />
       </CardBody>
     </Card>
   );

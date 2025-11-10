@@ -6,8 +6,14 @@ export interface ISite {
   description: string;
   url: string;
   tags: string[];
+  defaultShowcase: IShowcase;
   showcases: IShowcase[];
   placements: IPlacement[];
+  settings: {
+    pushWebhookOnCreateUpdate: boolean;
+    waitForWebhookSuccessResponse: boolean;
+    addPlacementsStructureToWebhook: boolean;
+  };
   webhookUrl: string;
   updatedAt?: Date;
 }

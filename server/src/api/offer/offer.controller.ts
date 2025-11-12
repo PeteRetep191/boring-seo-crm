@@ -27,10 +27,11 @@ export async function fetchOffers(
       filters: query.filters,
     });
 
-    return ApiResponse.success(reply, result);
+    // return ApiResponse.success(reply, result);
+    return reply.status(200).send(result);
   } catch (error) {
     console.error("Error fetching offers:", error);
-    return ApiResponse.error(reply, ErrorUtils.parseError(error), 400);
+    return reply.status(500).send(error);
   }
 }
 

@@ -23,17 +23,18 @@ export const fetchOffers = async (
   opts: OfferDTOs.FetchOffersDTO,
 ): Promise<{
   offers: IOfferDocument[];
-  total: number;
   pagination: { page: number; limit: number; pages: number; total: number };
 }> => {
   const { search, page, limit } = opts;
 
+  const filtersMatch = buildFiltersMatch?.(opts.filters);
   const searchRx = search?.trim() ? new RegExp(search.trim(), "i") : null;
   const and: any[] = [{ archived: { $ne: true } }];
   if (searchRx)
-    and.push({ $or: [{ name: searchRx }, { description: searchRx }] });
+    and.push({
+      $or: [{ name: searchRx }, { description: searchRx }, { bonus: searchRx }],
+    });
 
-  const filtersMatch = buildFiltersMatch?.(opts.filters);
   if (filtersMatch) and.push(filtersMatch);
 
   const pipeline: any[] = [];
@@ -51,7 +52,7 @@ export const fetchOffers = async (
 
   const agg = await OfferModel.aggregate(pipeline);
   const facet = agg[0] || { results: [], total: [] };
-  // hydrate → IOfferDocument[]
+
   const offers = (facet.results as any[]).map((o) =>
     OfferModel.hydrate(o),
   ) as IOfferDocument[];
@@ -59,7 +60,6 @@ export const fetchOffers = async (
 
   return {
     offers,
-    total,
     pagination: { page, limit, pages: Math.ceil(total / limit) || 1, total },
   };
 };
@@ -67,7 +67,6 @@ export const fetchOffers = async (
 export const getOfferById = async (
   id: string,
 ): Promise<IOfferDocument | null> => {
-  if (!Types.ObjectId.isValid(id)) return null;
   return OfferModel.findById(id);
 };
 

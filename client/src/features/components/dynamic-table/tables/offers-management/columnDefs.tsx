@@ -6,6 +6,8 @@ import { Button, Chip, Tooltip, Switch } from "@heroui/react";
 import { Edit, Trash2, ExternalLink } from "lucide-react";
 // Libs
 import { formatDateTime } from "@/shared/lib/date";
+// Types
+import { IOffer } from "@/features/offer/types";
 
 const PLACEHOLDER_LOGO = "/images/placeholder-logo.webp";
 
@@ -76,7 +78,7 @@ export const offerColumnDefs = [
             >
               <span className="text-base leading-none">
                 <span className="text-yellow-500 text-xs">{filled}</span>
-                <span className="text-gray-400">{empty}</span>
+                <span className="text-gray-400  text-xs">{empty}</span>
               </span>
               <span className="text-xs text-gray-500 dark:text-gray-400">
                 ({Number(r).toFixed(1)}/5)
@@ -118,7 +120,7 @@ export const offerColumnDefs = [
     },
   },
   {
-    headerName: "Partner",
+    headerName: "Partner URL",
     field: "partnerUrl",
     minWidth: 140,
     sortable: false,
@@ -156,10 +158,11 @@ export const offerColumnDefs = [
     suppressMovable: true,
     cellStyle: { display: "flex", alignItems: "center" },
     cellRenderer: (params: any) => {
-      const archived = !!params.data?.archived;
+      const isActive = params.data?.isActive;
+
       return (
-        <Chip size="sm" variant="flat" color={archived ? "danger" : "success"}>
-          {archived ? "Archived" : "Active"}
+        <Chip size="sm" variant="flat" color={isActive ? "success" : "default"}>
+          {isActive ? "Enabled" : "Disabled"}
         </Chip>
       );
     },

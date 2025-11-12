@@ -93,7 +93,7 @@ const SelectOffersForm: React.FC<ISelectOffersForm> = ({
               onPress={(offer) => {
                 if (selected?.includes(offer?._id || "")) return;
 
-                onSelect?.(offer);
+                onSelect?.(offer as any);
                 onClose?.();
                 console.log("pressed on offer: ", offer);
               }}

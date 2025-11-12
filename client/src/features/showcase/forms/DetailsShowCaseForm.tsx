@@ -3,6 +3,8 @@ import { useImmer } from "use-immer";
 // UI
 import { ShowcasePlacement } from "@/features/showcase/ui";
 import { Button, Tab, Tabs } from "@heroui/react";
+import { DeviceTypeMultiSelector } from "@/shared/components/multiselector/variants";
+import { MultiInput } from "@/shared/components/multiinput";
 // Icons
 import { InboxIcon } from "lucide-react";
 // Types
@@ -101,8 +103,34 @@ const DetailsShowCaseForm: React.FC<IDetailsShowCaseFormProps> = ({
   return (
     <div>
       <Tabs aria-label="Options">
-        <Tab key="details" title="Details">
-          details
+        <Tab key="details" title="Filters">
+          <div className="flex flex-col gap-3">
+            <DeviceTypeMultiSelector
+              value={form.filter?.devicesTypes || []}
+              onChange={(keys, _) => {
+                updateForm((draft) => {
+                  if (draft.filter) {
+                    draft.filter.devicesTypes = keys;
+                  }
+                });
+              }}
+            />
+            <MultiInput
+              value={form.filter?.ipAddresses || []}
+              onChange={(keys) => {
+                updateForm((draft) => {
+                  if (draft.filter) {
+                    draft.filter.ipAddresses = keys;
+                  }
+                });
+              }}
+              inputProps={{
+                label: "Ip addresses",
+                labelPlacement: "outside",
+                placeholder: "Enter IP address",
+              }}
+            />
+          </div>
         </Tab>
         <Tab key="placements" title="Placements">
           <div className="flex flex-col gap-2">

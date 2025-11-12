@@ -51,7 +51,7 @@ const usePlacementsManager = ({
         id: generatePlacementId(),
         name: "",
         type: null,
-        description: "",
+        // description: "",
       });
     });
   };

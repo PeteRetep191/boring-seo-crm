@@ -53,7 +53,7 @@ const INITIAL_STATE = {
   pagination: {
     page: 1,
     pages: 1,
-    totalRows: 0,
+    total: 0,
     limit: {
       default: 50,
       current: 50,
@@ -109,19 +109,17 @@ const OffersPage: React.FC = () => {
       queryParams.search,
     ],
     queryFn: async () => {
-      const res = await fetchOffers(queryParams);
-      if (!res?.data?.result) throw new Error("No data");
-      const { pagination } = res.data.result;
+      const response = await fetchOffers(queryParams).then((res) => res.data);
 
       update((d) => {
-        d.pagination.pages = pagination?.pages ?? 1;
-        d.pagination.page = pagination?.page ?? 1;
+        d.pagination.pages = response.pagination?.pages ?? 1;
+        d.pagination.page = response.pagination?.page ?? 1;
         d.pagination.limit.current =
-          pagination?.limit ?? INITIAL_STATE.pagination.limit.default;
-        // d.pagination.total = pagination?.total ?? 0;
+          response.pagination?.limit ?? INITIAL_STATE.pagination.limit.default;
+        d.pagination.total = response.pagination?.total ?? 0;
       });
 
-      return res.data.result;
+      return response;
     },
     select: (result) => result.offers ?? [],
     staleTime: 0,
@@ -297,7 +295,7 @@ const OffersPage: React.FC = () => {
             {formatPaginationStatus(
               state.pagination.page,
               state.pagination.limit.current,
-              state.pagination.totalRows,
+              state.pagination.total,
               {
                 locale: "en",
               },
